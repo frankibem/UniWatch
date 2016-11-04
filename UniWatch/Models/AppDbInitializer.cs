@@ -8,5 +8,10 @@ namespace UniWatch.Models
 {
     public class AppDbInitializer : DropCreateDatabaseIfModelChanges<AppDbContext>
     {
+        protected override void Seed(AppDbContext context)
+        {
+            // TODO: Initiailze database here
+            base.Seed(context);
+        }
     }
 }
