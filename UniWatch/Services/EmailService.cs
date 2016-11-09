@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
+using Microsoft.AspNet.Identity;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using UniWatch.Enumerations;
@@ -13,7 +15,7 @@ namespace UniWatch.Services
     /// <summary>
     /// Represents the email client for SendGrid
     /// </summary>
-    public class EmailService
+    public class EmailService : IIdentityMessageService
     {
         private readonly SendGridAPIClient _service;
 
@@ -57,7 +59,7 @@ namespace UniWatch.Services
         /// <returns>
         /// The result of the task
         /// </returns>
-        public async Task SendEmail(string from, string to, string subject, string body, EmailContentType type=null)
+        public async Task<dynamic> SendEmail(string from, string to, string subject, string body, EmailContentType type=null)
         {
             // If the user did not select a type,
             // then set the type to plain
@@ -74,7 +76,31 @@ namespace UniWatch.Services
             var mail = new Mail(emailFrom, subject, emailTo, content);
 
             // Send the email
-            await _service.client.mail.send.post(requestBody: mail.Get());
+            return await _service.client.mail.send.post(requestBody: mail.Get());
+        }
+
+        /// <summary>
+        /// Expose a way to send emails.
+        /// </summary>
+        /// <param name="message">
+        /// A message with a body, destination, and subject.
+        /// </param>
+        /// <returns>
+        /// The task.
+        /// </returns>
+        public Task SendAsync(IdentityMessage message)
+        {
+            var from = WebConfigurationManager.AppSettings["EmailFrom"];
+            var result = this.SendEmail(
+                from,
+                message.Destination,
+                message.Subject,
+                message.Body
+            );
+            Trace.TraceInformation(result.ToString());
+
+            // Twilio doesn't currently have an async API, so we return success.
+            return Task.FromResult(0);
         }
     }
 }

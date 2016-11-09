@@ -66,7 +66,7 @@ namespace UniWatch.Services
         public Task SendAsync(IdentityMessage message)
         {
             var from = WebConfigurationManager.AppSettings["TwilioSmsMessage"];
-            var result = this._service.SendMessage(from, message.Destination, message.Body);
+            var result = this.SendMessage(from, message.Destination, message.Body);
 
             Trace.TraceInformation(result.Status);
 
