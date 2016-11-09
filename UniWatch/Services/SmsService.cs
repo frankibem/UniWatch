@@ -7,7 +7,7 @@ using Twilio;
 namespace UniWatch.Services
 {
     /// <summary>
-    /// Represents the sms client for Twilio.
+    /// Represents the SMS client for Twilio.
     /// </summary>
     public class SmsService : IIdentityMessageService
     {
