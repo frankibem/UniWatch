@@ -11,7 +11,13 @@ namespace UniWatch.Services
     /// </summary>
     public class SmsService : IIdentityMessageService
     {
+        #region Fields and Properties
+
         private readonly TwilioRestClient _service;
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// The constructor for the SMS service
@@ -73,5 +79,7 @@ namespace UniWatch.Services
             // Twilio doesn't currently have an async API, so we return success.
             return Task.FromResult(0);
         }
+
+        #endregion
     }
 }

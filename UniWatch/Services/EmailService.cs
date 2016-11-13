@@ -8,7 +8,6 @@ using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using UniWatch.Enumerations;
 
 namespace UniWatch.Services
 {
@@ -17,7 +16,19 @@ namespace UniWatch.Services
     /// </summary>
     public class EmailService : IIdentityMessageService
     {
+        #region Fields and Properties
+
         private readonly SendGridAPIClient _service;
+
+        public enum EmailContentType
+        {
+            Plain,
+            Html
+        }
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// The constructor for the email service
@@ -59,18 +70,12 @@ namespace UniWatch.Services
         /// <returns>
         /// The result of the task
         /// </returns>
-        public async Task<dynamic> SendEmail(string from, string to, string subject, string body, EmailContentType type=null)
+        public async Task<dynamic> SendEmail(string from, string to, string subject, string body, 
+            EmailContentType type=EmailContentType.Plain)
         {
-            // If the user did not select a type,
-            // then set the type to plain
-            if (type == null)
-            {
-                type = EmailContentType.Plain;
-            }
-
             var emailFrom = new Email(from);
             var emailTo = new Email(to);
-            var content = new Content(type.Value, body);
+            var content = new Content(GetEmailContentString(type), body);
 
             // Prepare the email
             var mail = new Mail(emailFrom, subject, emailTo, content);
@@ -90,9 +95,8 @@ namespace UniWatch.Services
         /// </returns>
         public Task SendAsync(IdentityMessage message)
         {
-            var from = WebConfigurationManager.AppSettings["EmailFrom"];
             var result = this.SendEmail(
-                from,
+                WebConfigurationManager.AppSettings["EmailFrom"],
                 message.Destination,
                 message.Subject,
                 message.Body
@@ -102,5 +106,36 @@ namespace UniWatch.Services
             // Twilio doesn't currently have an async API, so we return success.
             return Task.FromResult(0);
         }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Get the email content type string
+        /// Default is "text/plain"
+        /// </summary>
+        /// <param name="type">
+        /// The email content type enumeration
+        /// </param>
+        /// <returns></returns>
+        private static string GetEmailContentString(EmailContentType type)
+        {
+            string contentString;
+
+            switch (type)
+            {
+                case EmailContentType.Html:
+                    contentString = "text/html";
+                    break;
+                default:
+                    contentString = "text/plain";
+                    break;
+            }
+
+            return contentString;
+        }
+
+        #endregion
     }
 }
