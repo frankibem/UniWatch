@@ -7,11 +7,17 @@ using Twilio;
 namespace UniWatch.Services
 {
     /// <summary>
-    /// Represents the sms client for Twilio.
+    /// Represents the SMS client for Twilio.
     /// </summary>
     public class SmsService : IIdentityMessageService
     {
+        #region Fields and Properties
+
         private readonly TwilioRestClient _service;
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// The constructor for the SMS service
@@ -66,12 +72,14 @@ namespace UniWatch.Services
         public Task SendAsync(IdentityMessage message)
         {
             var from = WebConfigurationManager.AppSettings["TwilioSmsMessage"];
-            var result = this._service.SendMessage(from, message.Destination, message.Body);
+            var result = this.SendMessage(from, message.Destination, message.Body);
 
             Trace.TraceInformation(result.Status);
 
             // Twilio doesn't currently have an async API, so we return success.
             return Task.FromResult(0);
         }
+
+        #endregion
     }
 }
