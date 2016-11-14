@@ -23,7 +23,7 @@ namespace UniWatch.Models
         /// <summary>
         /// The images that were recorded for this lecture
         /// </summary>
-        public virtual ICollection<Image> Images { get; set; }
+        public virtual ICollection<UploadedImage> Images { get; set; }
 
         /// <summary>
         /// The list of attendance information for this lecture

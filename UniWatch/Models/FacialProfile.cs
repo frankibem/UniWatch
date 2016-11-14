@@ -26,6 +26,6 @@ namespace UniWatch.Models
         /// <summary>
         /// Collection of facial images for this student
         /// </summary>
-        public virtual ICollection<Image> Images { get; set; }
+        public virtual ICollection<UploadedImage> Images { get; set; }
     }
 }
