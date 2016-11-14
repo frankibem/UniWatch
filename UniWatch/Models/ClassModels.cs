@@ -28,12 +28,17 @@ namespace UniWatch.Models
         /// <summary>
         /// The semester that this class is being taught
         /// </summary>
-        public string Semester { get; set; }
+        public Semester Semester { get; set; }
+
+        /// <summary>
+        /// The year the class is being taught
+        /// </summary>
+        public int Year { get; set; }
 
         /// <summary>
         /// The teacher in charge of this class
         /// </summary>
-        public virtual ApplicationUser Teacher { get; set; }
+        public virtual Teacher Teacher { get; set; }
 
         /// <summary>
         /// Enrollment information for this class
@@ -67,5 +72,16 @@ namespace UniWatch.Models
         /// The student related to this enrollment
         /// </summary>
         public virtual Student Student { get; set; }
+    }
+
+    /// <summary>
+    /// Constants for different semesters
+    /// </summary>
+    public enum Semester
+    {
+        Spring,
+        Summer1,
+        Summer2,
+        Fall
     }
 }

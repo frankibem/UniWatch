@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UniWatch.Models
 {
@@ -30,5 +31,16 @@ namespace UniWatch.Models
         /// The students facial profile
         /// </summary>
         public virtual FacialProfile Profile { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a teacher
+    /// </summary>
+    public class Teacher : User
+    {
+        /// <summary>
+        /// Classes taught by this teacher
+        /// </summary>
+        public virtual ICollection<Class> Classes { get; set; }
     }
 }
