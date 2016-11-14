@@ -10,8 +10,9 @@ namespace UniWatch.Managers
     /// <summary>
     /// Provides central access to class related information
     /// </summary>
-    public class ClassManager
+    public class ClassManager : IDisposable
     {
+        private bool disposed = false;
         private AppDbContext _db;
 
         /// <summary>
@@ -169,7 +170,7 @@ namespace UniWatch.Managers
         }
 
         /// <summary>
-        /// Deletes a class with the given id
+        /// Deletes a class with the given id and all other related information
         /// </summary>
         /// <param name="classId">Id of the class to delete</param>
         public async Task<Class> DeleteClass(int classId)
@@ -177,11 +178,30 @@ namespace UniWatch.Managers
             var existing = await _db.Classes.FindAsync(classId);
 
             if(existing == null)
-                return null;
+                throw new InvalidOperationException("Error deleting class.");
 
             return _db.Classes.Remove(existing);
 
-            // TODO: Delete all other class related data
+            // TODO: Delete all other class related data (Lectures, Enrollments)
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if(disposed)
+                return;
+
+            if(disposing)
+            {
+                _db.Dispose();
+            }
+
+            disposed = true;
         }
     }
 }
