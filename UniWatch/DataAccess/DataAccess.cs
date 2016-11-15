@@ -70,6 +70,34 @@ namespace UniWatch.DataAccess
             }
         }
 
+        /// <summary>
+        /// Initializes a default data access object
+        /// </summary>
+        public DataAccess() : this(new AppDbContext())
+        { }
+
+        /// <summary>
+        /// Initializes a new data access object using the given context
+        /// </summary>
+        /// <param name="context">The context to initialize the data access object with</param>
+        public DataAccess(AppDbContext context)
+        {
+            _db = context;
+        }
+
+        /// <summary>
+        /// Initializes a new data access object using the given managers
+        /// </summary>
+        /// <param name="classManager"></param>
+        /// <param name="lectureManager"></param>
+        /// <param name="studentManager"></param>
+        public DataAccess(IClassManager classManager, ILectureManager lectureManager, IStudentManager studentManager)
+        {
+            _classManager = classManager;
+            _lectureManager = lectureManager;
+            _studentManager = StudentManager;         
+        }
+
         #region IDisposable Support
         private bool disposed = false; // To detect redundant calls
 

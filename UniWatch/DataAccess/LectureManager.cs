@@ -50,8 +50,7 @@ namespace UniWatch.DataAccess
         public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
             return _db.Lectures.
-                Where(lecture => lecture.Class.Id == classId)
-                .ToList();
+                Where(lecture => lecture.Class.Id == classId);
         }
 
         /// <summary>
@@ -63,8 +62,7 @@ namespace UniWatch.DataAccess
         public IEnumerable<StudentAttendance> GetStudentReport(int classId, int studentId)
         {
             return _db.Attendance
-                .Where(a => a.Lecture.Class.Id == classId && a.Student.Id == studentId)
-                .ToList();
+                .Where(a => a.Lecture.Class.Id == classId && a.Student.Id == studentId);
         }
 
         /// <summary>
@@ -74,11 +72,11 @@ namespace UniWatch.DataAccess
         /// <returns>The updated lecture</returns>
         public Lecture Update(Lecture lecture)
         {
-            var lect = _db.Lectures.Find(lecture.Id);
+            var existing = _db.Lectures.Find(lecture.Id);
 
             // Doesn't exist
-            if(lecture == null)
-                throw new InvalidOperationException("");
+            if(existing == null)
+                throw new InvalidOperationException("Error updating lecture");
 
             _db.Entry(lecture).State = EntityState.Modified;
             _db.SaveChanges();

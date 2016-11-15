@@ -11,16 +11,14 @@ namespace UniWatch.DataAccess
     /// </summary>
     public class ClassManager : IClassManager
     {
-        private bool disposed = false;
+        private bool _disposed = false;
         private AppDbContext _db;
 
         /// <summary>
         /// Creates a default ClassManager
         /// </summary>
-        public ClassManager()
-        {
-            _db = new AppDbContext();
-        }
+        public ClassManager() : this(new AppDbContext())
+        { }
 
         /// <summary>
         /// Creates a ClassManager with the given context
@@ -44,12 +42,11 @@ namespace UniWatch.DataAccess
         public Class CreateClass(string name, int number, string section, Semester semester, int year, int teacherId)
         {
             var existing = _db.Classes
-                .Where(c => c.Name == name &&
+                .Count(c => c.Name == name &&
                         c.Number == number &&
                         c.Section == section &&
                         c.Semester == semester &&
-                        c.Teacher.Id == teacherId)
-                .Count();
+                        c.Teacher.Id == teacherId);
 
             var teacher = _db.Teachers.Find(teacherId);
 
@@ -89,8 +86,7 @@ namespace UniWatch.DataAccess
         {
             return _db.Classes
                 .Where(@class => @class.Teacher.Id == teacherId)
-                .Include(c => c.Lectures)
-                .ToList();
+                .Include(c => c.Lectures);
         }
 
         /// <summary>
@@ -121,7 +117,7 @@ namespace UniWatch.DataAccess
 
             // Already enrolled
             if(existing == null)
-                return null;
+                throw new InvalidOperationException("Error enrolling student");
 
             var toAdd = new Enrollment
             {
@@ -149,7 +145,7 @@ namespace UniWatch.DataAccess
                 .FirstOrDefault();
 
             if(enrollment == null)
-                return null;
+                throw new InvalidOperationException("Error unenrolling student");
 
             return _db.Enrollments.Remove(enrollment);
 
@@ -164,8 +160,7 @@ namespace UniWatch.DataAccess
         public IEnumerable<Student> GetEnrolledStudents(int classId)
         {
             return _db.Enrollments.Where(e => e.Class.Id == classId)
-                .Select(e => e.Student)
-                .ToList();
+                .Select(e => e.Student);
         }
 
         /// <summary>
@@ -192,7 +187,7 @@ namespace UniWatch.DataAccess
 
         protected virtual void Dispose(bool disposing)
         {
-            if(disposed)
+            if(_disposed)
                 return;
 
             if(disposing)
@@ -200,7 +195,7 @@ namespace UniWatch.DataAccess
                 _db.Dispose();
             }
 
-            disposed = true;
+            _disposed = true;
         }
     }
 }
