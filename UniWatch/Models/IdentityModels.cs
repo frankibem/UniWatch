@@ -15,5 +15,7 @@ namespace UniWatch.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        public virtual User User { get; set; }
     }
 }

@@ -17,10 +17,11 @@ namespace UniWatch.Models
 
         public DbSet<Class> Classes { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Lecture> Lectures { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<StudentAttendance> Attendance { get; set; }
-        public DbSet<Image> Images { get; set; }
+        public DbSet<UploadedImage> Images { get; set; }
         public DbSet<FacialProfile> FacialProfiles { get; set; }
     }
 }
