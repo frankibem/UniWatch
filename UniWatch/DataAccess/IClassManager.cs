@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UniWatch.Models;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     public interface IClassManager : IDisposable
     {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using UniWatch.Models;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     /// <summary>
     /// Interacts with Azure Storage Manager to handle image storate related operations

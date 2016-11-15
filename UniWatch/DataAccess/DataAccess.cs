@@ -1,7 +1,7 @@
 ﻿using System;
 using UniWatch.Models;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     public class DataAccess : IDataAccess
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using UniWatch.Models;
 using System.Data.Entity;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     /// <summary>
     /// Provides central access to class related information

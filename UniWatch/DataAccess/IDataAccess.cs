@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     /// <summary>
     /// Provides central access to data managers

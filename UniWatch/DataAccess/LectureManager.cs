@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UniWatch.Models;
 
-namespace UniWatch.Managers
+namespace UniWatch.DataAccess
 {
     /// <summary>
     /// Provides central access to Lecture related information

@@ -236,15 +236,15 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Managers\ClassManager.cs" />
-    <Compile Include="Managers\DataAccess.cs" />
-    <Compile Include="Managers\IClassManager.cs" />
-    <Compile Include="Managers\IDataAccess.cs" />
-    <Compile Include="Managers\ILectureManager.cs" />
-    <Compile Include="Managers\IStudentManager.cs" />
-    <Compile Include="Managers\LectureManager.cs" />
-    <Compile Include="Managers\StorageManager.cs" />
-    <Compile Include="Managers\StudentManager.cs" />
+    <Compile Include="DataAccess\ClassManager.cs" />
+    <Compile Include="DataAccess\DataAccess.cs" />
+    <Compile Include="DataAccess\IClassManager.cs" />
+    <Compile Include="DataAccess\IDataAccess.cs" />
+    <Compile Include="DataAccess\ILectureManager.cs" />
+    <Compile Include="DataAccess\IStudentManager.cs" />
+    <Compile Include="DataAccess\LectureManager.cs" />
+    <Compile Include="DataAccess\StorageManager.cs" />
+    <Compile Include="DataAccess\StudentManager.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\SmsService.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
