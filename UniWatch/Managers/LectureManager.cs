@@ -10,7 +10,7 @@ namespace UniWatch.Managers
     /// <summary>
     /// Provides central access to Lecture related information
     /// </summary>
-    public class LectureManager : IDisposable
+    public class LectureManager : ILectureManager
     {
         private bool disposed = false;
         private AppDbContext _db;
@@ -37,9 +37,9 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="lectureId">The id of the lecture</param>
         /// <returns>The lecture with the given id</returns>
-        public async Task<Lecture> GetLecture(int lectureId)
+        public Lecture Get(int lectureId)
         {
-            return await _db.Lectures.FindAsync(lectureId);
+            return _db.Lectures.Find(lectureId);
         }
 
         /// <summary>
@@ -47,11 +47,11 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="classId">The id of the class</param>
         /// <returns>A list of all lectures for the class</returns>
-        public async Task<IEnumerable<Lecture>> GetTeacherReport(int classId)
+        public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
-            return await _db.Lectures.
+            return _db.Lectures.
                 Where(lecture => lecture.Class.Id == classId)
-                .ToListAsync();
+                .ToList();
         }
 
         /// <summary>
@@ -60,11 +60,11 @@ namespace UniWatch.Managers
         /// <param name="classId">The id of the class</param>
         /// <param name="studentId">The id of the student</param>
         /// <returns>The list of attendance for the student in the class</returns>
-        public async Task<IEnumerable<StudentAttendance>> GetStudentReport(int classId, int studentId)
+        public IEnumerable<StudentAttendance> GetStudentReport(int classId, int studentId)
         {
-            return await _db.Attendance
+            return _db.Attendance
                 .Where(a => a.Lecture.Class.Id == classId && a.Student.Id == studentId)
-                .ToListAsync();
+                .ToList();
         }
 
         /// <summary>
@@ -72,16 +72,16 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="lecture">The lecture to update</param>
         /// <returns>The updated lecture</returns>
-        public async Task<Lecture> UpdateLecture(Lecture lecture)
+        public Lecture Update(Lecture lecture)
         {
-            var lect = await _db.Lectures.FindAsync(lecture.Id);
+            var lect = _db.Lectures.Find(lecture.Id);
 
             // Doesn't exist
             if(lecture == null)
                 throw new InvalidOperationException("");
 
             _db.Entry(lecture).State = EntityState.Modified;
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
 
             return lecture;
         }
@@ -91,9 +91,9 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="lectureId">The id of the lecture to delete</param>
         /// <returns>The deleted lecture</returns>
-        public async Task<Lecture> DeleteLecture(int lectureId)
+        public Lecture Delete(int lectureId)
         {
-            var existing = await _db.Lectures.FindAsync(lectureId);
+            var existing = _db.Lectures.Find(lectureId);
 
             if(existing == null)
                 throw new InvalidOperationException("Error deleting class.");
@@ -103,16 +103,16 @@ namespace UniWatch.Managers
             // TODO: Delete all other lecture related information (Images (and blobs), Attendance)
         }
 
-        ///// <summary>
-        ///// Creates a new lecture for a class using the given images
-        ///// </summary>
-        ///// <param name="classId">The id of the class to which the lecture belongs</param>
-        ///// <param name="images">A list of images to create the recording from</param>
-        ///// <returns></returns>
-        //public async Task RecordLecture(int classId, List<Stream> images)
-        //{
-
-        //}
+        /// <summary>
+        /// Create and save a new lecture
+        /// </summary>
+        /// <param name="lecture">The lecture to create</param>
+        /// <returns>The created lecture</returns>
+        public Lecture Create(Lecture lecture)
+        {
+            // TODO: Implemente Create Lecture
+            return null;
+        }
 
         public void Dispose()
         {

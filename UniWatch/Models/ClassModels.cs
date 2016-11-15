@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace UniWatch.Models
 {
@@ -8,11 +9,13 @@ namespace UniWatch.Models
     /// </summary>
     public class Class
     {
+        [Required]
         public int Id { get; set; }
 
         /// <summary>
         /// The name of this course
         /// </summary>
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -56,18 +59,22 @@ namespace UniWatch.Models
     /// </summary>
     public class Enrollment
     {
+        [Required]
         public int Id { get; set; }
 
         /// <summary>
         /// The date on which this student was enrolled in the class
         /// </summary>
+        [Required]
         public DateTime EnrollDate { get; set; }
 
+        [Required]
         /// <summary>
         /// The class related to this enrollment
         /// </summary>
         public virtual Class Class { get; set; }
 
+        [Required]
         /// <summary>
         /// The student related to this enrollment
         /// </summary>

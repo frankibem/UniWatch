@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UniWatch.Models
 {
@@ -10,7 +12,8 @@ namespace UniWatch.Models
         /// <summary>
         /// The ID of this facial profile
         /// </summary>
-        public string Id { get; set; }
+        [Key, ForeignKey("Student")]
+        public int Id { get; set; }
 
         /// <summary>
         /// True if the recognizer has been trained to recognize the images in this profile.

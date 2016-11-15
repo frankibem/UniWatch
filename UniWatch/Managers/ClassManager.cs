@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UniWatch.Models;
 using System.Data.Entity;
 
@@ -10,7 +9,7 @@ namespace UniWatch.Managers
     /// <summary>
     /// Provides central access to class related information
     /// </summary>
-    public class ClassManager : IDisposable
+    public class ClassManager : IClassManager
     {
         private bool disposed = false;
         private AppDbContext _db;
@@ -42,17 +41,17 @@ namespace UniWatch.Managers
         /// <param name="teacher">The teacher for this class</param>
         /// <returns>The created class</returns>
         /// <remarks>Throws InvalidOperationException if class already exists with the given details</remarks>
-        public async Task<Class> CreateClass(string name, int number, string section, Semester semester, int year, int teacherId)
+        public Class CreateClass(string name, int number, string section, Semester semester, int year, int teacherId)
         {
-            var existing = await _db.Classes
+            var existing = _db.Classes
                 .Where(c => c.Name == name &&
                         c.Number == number &&
                         c.Section == section &&
                         c.Semester == semester &&
                         c.Teacher.Id == teacherId)
-                .CountAsync();
+                .Count();
 
-            var teacher = await _db.Teachers.FindAsync(teacherId);
+            var teacher = _db.Teachers.Find(teacherId);
 
             if(existing > 0 || teacher == null)
                 throw new InvalidOperationException("Error creating class");
@@ -67,7 +66,7 @@ namespace UniWatch.Managers
             };
 
             var added = _db.Classes.Add(newClass);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
             return added;
         }
 
@@ -76,9 +75,9 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="classId">The id of the class</param>
         /// <returns>The class with the given id or null if not found</returns>
-        public async Task<Class> GetById(int classId)
+        public Class GetById(int classId)
         {
-            return await _db.Classes.FindAsync(classId);
+            return _db.Classes.Find(classId);
         }
 
         /// <summary>
@@ -86,12 +85,12 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="teacherId">The id of the teacher</param>
         /// <returns>List of classes taught by the teacher</returns>
-        public async Task<IEnumerable<Class>> GetClassesForTeacher(int teacherId)
+        public IEnumerable<Class> GetClassesForTeacher(int teacherId)
         {
-            return await _db.Classes
+            return _db.Classes
                 .Where(@class => @class.Teacher.Id == teacherId)
                 .Include(c => c.Lectures)
-                .ToListAsync();
+                .ToList();
         }
 
         /// <summary>
@@ -99,12 +98,12 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="studentId">The id of the student</param>
         /// <returns>List of classes that the student is enrolled in</returns>
-        public async Task<IEnumerable<Class>> GetClassesForStudent(int studentId)
+        public IEnumerable<Class> GetClassesForStudent(int studentId)
         {
-            return await _db.Enrollments.Where(e => e.Student.Id == studentId)
+            return _db.Enrollments.Where(e => e.Student.Id == studentId)
                 .Select(e => e.Class)
                 .Include(c => c.Lectures)
-                .ToListAsync();
+                .ToList();
         }
 
         /// <summary>
@@ -113,12 +112,12 @@ namespace UniWatch.Managers
         /// <param name="classId">The id of the class to enroll the student into</param>
         /// <param name="studentId">The id of the student to enroll</param>
         /// <returns>The enrollment created</returns>
-        public async Task<Enrollment> EnrollStudent(int classId, int studentId)
+        public Enrollment EnrollStudent(int classId, int studentId)
         {
-            var existing = await _db.Enrollments.Where(e => e.Class.Id == classId && e.Student.Id == studentId)
+            var existing = _db.Enrollments.Where(e => e.Class.Id == classId && e.Student.Id == studentId)
                 .Include(e => e.Class)
                 .Include(e => e.Student)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             // Already enrolled
             if(existing == null)
@@ -132,7 +131,7 @@ namespace UniWatch.Managers
             };
 
             _db.Enrollments.Add(toAdd);
-            await _db.SaveChangesAsync();
+            _db.SaveChanges();
 
             return toAdd;
         }
@@ -143,11 +142,11 @@ namespace UniWatch.Managers
         /// <param name="classId">The id of the class to remove the student from</param>
         /// <param name="studentId">The id of the student to unenroll</param>
         /// <returns>The deleted enrollment</returns>
-        public async Task<Enrollment> UnEnrollStudent(int classId, int studentId)
+        public Enrollment UnEnrollStudent(int classId, int studentId)
         {
-            var enrollment = await _db.Enrollments
+            var enrollment = _db.Enrollments
                 .Where(e => e.Class.Id == classId && e.Student.Id == studentId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if(enrollment == null)
                 return null;
@@ -162,20 +161,20 @@ namespace UniWatch.Managers
         /// </summary>
         /// <param name="classId">The id of the class</param>
         /// <returns>List of all students enrolled in the class</returns>
-        public async Task<IEnumerable<Student>> GetEnrolledStudents(int classId)
+        public IEnumerable<Student> GetEnrolledStudents(int classId)
         {
-            return await _db.Enrollments.Where(e => e.Class.Id == classId)
+            return _db.Enrollments.Where(e => e.Class.Id == classId)
                 .Select(e => e.Student)
-                .ToListAsync();
+                .ToList();
         }
 
         /// <summary>
         /// Deletes a class with the given id and all other related information
         /// </summary>
         /// <param name="classId">Id of the class to delete</param>
-        public async Task<Class> DeleteClass(int classId)
+        public Class DeleteClass(int classId)
         {
-            var existing = await _db.Classes.FindAsync(classId);
+            var existing = _db.Classes.Find(classId);
 
             if(existing == null)
                 throw new InvalidOperationException("Error deleting class.");
