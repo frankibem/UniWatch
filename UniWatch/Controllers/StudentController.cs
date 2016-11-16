@@ -35,10 +35,12 @@ namespace UniWatch.Controllers
         }
 
         // GET: Enroll
+        [HttpGet]
         public ActionResult Enroll(int classId)
         {
+            var @class = _dataAccess.ClassManager.GetById(classId);
             //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
-            return View();
+            return View(new EnrollViewModel() { Class = @class });
         }
 
         // GET: Get
@@ -57,9 +59,12 @@ namespace UniWatch.Controllers
         }
 
         //POST: Enroll
-        public ActionResult Enroll()
+        [HttpPost, ActionName("Enroll")]
+        [ValidateAntiForgeryToken]
+        public ActionResult EnrollConfirmed(int classId, int studentId)
         {
-            return View();
+            _dataAccess.ClassManager.EnrollStudent(classId, studentId);
+            return RedirectToAction("Index", new { classId = classId });
         }
     }
 } 
