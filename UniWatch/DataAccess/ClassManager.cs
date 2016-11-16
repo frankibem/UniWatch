@@ -141,8 +141,7 @@ namespace UniWatch.DataAccess
         public Enrollment UnEnrollStudent(int classId, int studentId)
         {
             var enrollment = _db.Enrollments
-                .Where(e => e.Class.Id == classId && e.Student.Id == studentId)
-                .FirstOrDefault();
+                .FirstOrDefault(e => e.Class.Id == classId && e.Student.Id == studentId);
 
             if(enrollment == null)
                 throw new InvalidOperationException("Error unenrolling student");

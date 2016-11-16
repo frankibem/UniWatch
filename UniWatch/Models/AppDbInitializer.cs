@@ -7,6 +7,7 @@ using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using RestSharp.Extensions;
+using UniWatch.DataAccess;
 
 namespace UniWatch.Models
 {
@@ -15,6 +16,7 @@ namespace UniWatch.Models
         private AppDbContext _context;
         private ApplicationUserManager _userManager;
         private RoleManager<IdentityRole> _roleManager;
+        private ClassManager _classManager;
         private string _pwd;
 
         protected override void Seed(AppDbContext context)
@@ -22,6 +24,7 @@ namespace UniWatch.Models
             _context = context;
             _userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(_context));
             _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
+            _classManager = new ClassManager(_context);
             _pwd = WebConfigurationManager.AppSettings["TestPassword"];
 
             // Create user roles if they do not exist
@@ -44,14 +47,14 @@ namespace UniWatch.Models
                 new ApplicationUser() { UserName = "iteach", Email = "teach@uniwatch.io", PhoneNumber = "5551231234" }
             };
 
-            //var teachers = new List<Teacher>
-            //{
-            //    new Teacher() { FirstName = "All", LastName = "Classes", Identity = teacherList[0] },
-            //    new Teacher() { FirstName = "No", LastName = "Classes", Identity = teacherList[1] },
-            //    new Teacher() { FirstName = "Some", LastName = "Classes", Identity = teacherList[2] },
-            //};
+            var teachers = new List<Teacher>
+            {
+                new Teacher() { FirstName = "All", LastName = "Classes", Identity = teacherList[0] },
+                new Teacher() { FirstName = "No", LastName = "Classes", Identity = teacherList[1] },
+                new Teacher() { FirstName = "Some", LastName = "Classes", Identity = teacherList[2] },
+            };
 
-            //CreateUsers<Teacher>(teachers, teacherRole);
+            CreateUsersAndAddToRole<Teacher>(teachers, teacherRole);
 
             // Create some students
             var studentList = new List<ApplicationUser>
@@ -74,30 +77,17 @@ namespace UniWatch.Models
             CreateUsersAndAddToRole<Student>(students, studentRole);
 
             // Create some classes
-            var classes = new List<Class>
-            {
-                new Class() { Name = "Class 0", Number = 0, Section = "All", /*Teacher = teachers[0]*/},
-                new Class() { Name = "Class 1", Number = 1, Section = "Some", /*Teacher = teachers[3]*/},
-                new Class() { Name = "Class 2", Number = 2, Section = "Another Sect", /*Teacher = teachers[0]*/}
-            };
+            _classManager.CreateClass("Class 0", 0, "All", Semester.Fall, 2016, teachers[0].Id);
+            _classManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[3].Id);
+            _classManager.CreateClass("Class 2", 0, "Another Sect", Semester.Summer1, 2017, teachers[0].Id);
 
-            _context.Classes.AddRange(classes);
-            _context.SaveChanges();
+            var classes = _context.Classes.ToList();
 
             // Enroll some students in some classes
-            var yesterday = DateTime.Today.AddDays(-1);
-            var lastWeek = DateTime.Today.AddDays(-7);
-
-            var enrollment = new List<Enrollment>
-            {
-                new Enrollment() { Student = students[0], Class = classes[0], EnrollDate = lastWeek },
-                new Enrollment() { Student = students[0], Class = classes[1], EnrollDate = lastWeek },
-                new Enrollment() { Student = students[1], Class = classes[0], EnrollDate = yesterday },
-                new Enrollment() { Student = students[2], Class = classes[0], EnrollDate = yesterday }
-            };
-
-            _context.Enrollments.AddRange(enrollment);
-            _context.SaveChanges();
+            _classManager.EnrollStudent(classes[0].Id, students[0].Id);
+            _classManager.EnrollStudent(classes[0].Id, students[1].Id);
+            _classManager.EnrollStudent(classes[1].Id, students[0].Id);
+            _classManager.EnrollStudent(classes[2].Id, students[0].Id);
 
             // Create some facial profiles for the students
             var facialProfiles = new List<FacialProfile>
