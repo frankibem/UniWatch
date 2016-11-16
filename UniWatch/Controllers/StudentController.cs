@@ -3,26 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using UniWatch.DataAccess;
+using UniWatch.ViewModels;
 
 namespace UniWatch.Controllers
 {
     public class StudentController : Controller
     {
+        private IDataAccess _dataAccess;
+        
+        public StudentController()
+        {
+            _dataAccess = new DataAccess.DataAccess();
+        } 
+
         // GET: Student
         public ActionResult Index(int classId)
         {
-            return View();
+            var students = _dataAccess.ClassManager.GetEnrolledStudents(classId);
+            return View(students);
         }
 
         // GET: Unenroll
-        public ActionResult Unenroll(int classId, int studentId)
+        [HttpGet]
+        public ActionResult UnEnroll(int classId, int studentId)
         {
-            return View();
+            var @class = _dataAccess.ClassManager.GetById(classId);
+            var student = _dataAccess.StudentManager.GetById(studentId);
+
+            return View(new UnEnrollViewModel() { Class = @class, Student = student });
         }
 
         // GET: Enroll
         public ActionResult Enroll(int classId)
         {
+            //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
             return View();
         }
 
@@ -33,9 +48,12 @@ namespace UniWatch.Controllers
         }
 
         // POST: Unenroll
-        public ActionResult Unenroll()
+        [HttpPost, ActionName("UnEnroll")]
+        [ValidateAntiForgeryToken]
+        public ActionResult UnEnrollCofirmed(int classId, int studentId)
         {
-            return View();
+            _dataAccess.ClassManager.UnEnrollStudent(classId, studentId);
+            return RedirectToAction("Index", new { classId = classId });
         }
 
         //POST: Enroll

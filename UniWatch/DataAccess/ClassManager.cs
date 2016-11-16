@@ -148,9 +148,11 @@ namespace UniWatch.DataAccess
             if(enrollment == null)
                 throw new InvalidOperationException("Error unenrolling student");
 
-            return _db.Enrollments.Remove(enrollment);
-
             // TODO: Delete all other student related data
+
+            _db.Enrollments.Remove(enrollment);
+            _db.SaveChanges();
+            return enrollment;
         }
 
         /// <summary>

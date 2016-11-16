@@ -1,0 +1,21 @@
+﻿@model UniWatch.ViewModels.UnEnrollViewModel
+
+@{
+    ViewBag.Title = "UnEnroll";
+}
+
+<h2>UnEnroll</h2>
+
+<h3>Are you sure you want to remove 
+    @string.Format("\"{0} {1}\"", Model.Student.FirstName, Model.Student.LastName) 
+    from @string.Format("{0}", Model.Class.Name)</h3>
+<div>
+    @using (Html.BeginForm("UnEnroll", "Student", new { classId = Model.Class.Id, studentId = Model.Student.Id }, FormMethod.Post)) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Cancel", "Index", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>
