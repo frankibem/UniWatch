@@ -110,20 +110,22 @@ namespace UniWatch.DataAccess
         /// <returns>The enrollment created</returns>
         public Enrollment EnrollStudent(int classId, int studentId)
         {
-            var existing = _db.Enrollments.Where(e => e.Class.Id == classId && e.Student.Id == studentId)
-                .Include(e => e.Class)
-                .Include(e => e.Student)
+            var existing = _db.Enrollments
+                .Where(e => e.Class.Id == classId && e.Student.Id == studentId)
                 .FirstOrDefault();
 
+            var @class = _db.Classes.Find(classId);
+            var student = _db.Students.Find(studentId);
+
             // Already enrolled
-            if(existing == null)
+            if(existing != null)
                 throw new InvalidOperationException("Error enrolling student");
 
             var toAdd = new Enrollment
             {
-                Class = existing.Class,
+                Class = @class,
                 EnrollDate = DateTime.Now,
-                Student = existing.Student
+                Student = student
             };
 
             _db.Enrollments.Add(toAdd);

@@ -11,7 +11,7 @@ using UniWatch.DataAccess;
 
 namespace UniWatch.Models
 {
-    public class AppDbInitializer : DropCreateDatabaseIfModelChanges<AppDbContext>
+    public class AppDbInitializer : DropCreateDatabaseAlways<AppDbContext>
     {
         private AppDbContext _context;
         private ApplicationUserManager _userManager;
@@ -78,7 +78,7 @@ namespace UniWatch.Models
 
             // Create some classes
             _classManager.CreateClass("Class 0", 0, "All", Semester.Fall, 2016, teachers[0].Id);
-            _classManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[3].Id);
+            _classManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[1].Id);
             _classManager.CreateClass("Class 2", 0, "Another Sect", Semester.Summer1, 2017, teachers[0].Id);
 
             var classes = _context.Classes.ToList();
