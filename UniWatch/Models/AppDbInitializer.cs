@@ -31,6 +31,7 @@ namespace UniWatch.Models
             const string teacherRole = "Teacher";
             const string studentRole = "Student";
             var roles = new List<string> {"Admin", teacherRole, studentRole };
+
             foreach (var role in roles)
             {
                 if (!_roleManager.RoleExists(role))
