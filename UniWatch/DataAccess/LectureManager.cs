@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
+using RestSharp.Extensions;
 using UniWatch.Models;
 
 namespace UniWatch.DataAccess
@@ -50,7 +51,8 @@ namespace UniWatch.DataAccess
         public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
             return _db.Lectures.
-                Where(lecture => lecture.Class.Id == classId);
+                Where(lecture => lecture.Class.Id == classId)
+                .Include(lecture => lecture.Attendance);
         }
 
         /// <summary>

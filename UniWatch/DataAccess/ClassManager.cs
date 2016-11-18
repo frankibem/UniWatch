@@ -111,8 +111,7 @@ namespace UniWatch.DataAccess
         public Enrollment EnrollStudent(int classId, int studentId)
         {
             var existing = _db.Enrollments
-                .Where(e => e.Class.Id == classId && e.Student.Id == studentId)
-                .FirstOrDefault();
+                .FirstOrDefault(e => e.Class.Id == classId && e.Student.Id == studentId);
 
             var @class = _db.Classes.Find(classId);
             var student = _db.Students.Find(studentId);

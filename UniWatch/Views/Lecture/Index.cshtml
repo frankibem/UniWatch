@@ -1,8 +1,67 @@
-﻿
+﻿@using UniWatch.Models
+@model IEnumerable<UniWatch.Models.Lecture>
+
 @{
-    ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<h2>@ViewBag.Title</h2>
+<hr />
 
+@{
+    if (!Model.Any())
+    {
+        <h4>There are no lectures for this class</h4>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Student</th>
+                @foreach (var lecture in Model)
+                {
+                    <th>
+                        @Html.ActionLink(
+                            lecture.RecordDate.ToShortDateString(),
+                            "Override",
+                            "Lecture",
+                            new
+                            {
+                                lectureId = lecture.Id
+                            },
+                            null
+                            )
+                    </th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (Student student in ViewBag.Students)
+            {
+                <tr>
+                    <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
+                    
+                    @foreach (var lecture in Model)
+                    {
+                        var isPresent = lecture.Attendance.
+                            SingleOrDefault(a => a.Student.Id == student.Id && a.Lecture.Id == lecture.Id)?
+                            .Present ?? false;
+
+                        <td>
+                            @if (isPresent)
+                            {
+                                <span class="glyphicon glyphicon-ok" style="color: green;"></span>
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                            }
+                        </td>
+                    }
+                </tr>  
+            }
+            </tbody>
+        </table>
+    }
+}

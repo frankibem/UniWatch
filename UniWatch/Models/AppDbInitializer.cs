@@ -14,17 +14,17 @@ namespace UniWatch.Models
     public class AppDbInitializer : DropCreateDatabaseAlways<AppDbContext>
     {
         private AppDbContext _context;
+        private DataAccess.DataAccess _manager;
         private ApplicationUserManager _userManager;
         private RoleManager<IdentityRole> _roleManager;
-        private ClassManager _classManager;
         private string _pwd;
 
         protected override void Seed(AppDbContext context)
         {
             _context = context;
+            _manager = new DataAccess.DataAccess(_context);
             _userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(_context));
             _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
-            _classManager = new ClassManager(_context);
             _pwd = WebConfigurationManager.AppSettings["TestPassword"];
 
             // Create user roles if they do not exist
@@ -78,17 +78,31 @@ namespace UniWatch.Models
             CreateUsersAndAddToRole<Student>(students, studentRole);
 
             // Create some classes
-            _classManager.CreateClass("Class 0", 0, "All", Semester.Fall, 2016, teachers[0].Id);
-            _classManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[1].Id);
-            _classManager.CreateClass("Class 2", 0, "Another Sect", Semester.Summer1, 2017, teachers[0].Id);
+            _manager.ClassManager.CreateClass("Class 0", 0, "All", Semester.Fall, 2016, teachers[0].Id);
+            _manager.ClassManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[1].Id);
+            _manager.ClassManager.CreateClass("Class 2", 0, "Another Sect", Semester.Summer1, 2017, teachers[0].Id);
 
             var classes = _context.Classes.ToList();
 
             // Enroll some students in some classes
-            _classManager.EnrollStudent(classes[0].Id, students[0].Id);
-            _classManager.EnrollStudent(classes[0].Id, students[1].Id);
-            _classManager.EnrollStudent(classes[1].Id, students[0].Id);
-            _classManager.EnrollStudent(classes[2].Id, students[0].Id);
+            _manager.ClassManager.EnrollStudent(classes[0].Id, students[0].Id);
+            _manager.ClassManager.EnrollStudent(classes[0].Id, students[1].Id);
+            _manager.ClassManager.EnrollStudent(classes[1].Id, students[0].Id);
+            _manager.ClassManager.EnrollStudent(classes[2].Id, students[0].Id);
+
+            // Create some lectures for the classes
+            var lectures = new List<Lecture>
+            {
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today }
+            };
+
+            _context.Lectures.AddRange(lectures);
+            _context.SaveChanges();
+
+            // Associate some attendance for a lecture
+            _context.Attendance.Add(new StudentAttendance() { Student = students[0], Lecture = lectures[0], Present = true });
+            _context.Attendance.Add(new StudentAttendance() { Student = students[1], Lecture = lectures[0], Present = false });
+            _context.SaveChanges();
 
             // Create some facial profiles for the students
             var facialProfiles = new List<FacialProfile>

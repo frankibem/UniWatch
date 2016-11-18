@@ -68,16 +68,16 @@ namespace UniWatch.Models
         [Required]
         public DateTime EnrollDate { get; set; }
 
-        [Required]
         /// <summary>
         /// The class related to this enrollment
         /// </summary>
+        [Required]
         public virtual Class Class { get; set; }
 
-        [Required]
         /// <summary>
         /// The student related to this enrollment
         /// </summary>
+        [Required]
         public virtual Student Student { get; set; }
     }
 
