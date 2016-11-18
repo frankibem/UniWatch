@@ -93,7 +93,9 @@ namespace UniWatch.Models
             // Create some lectures for the classes
             var lectures = new List<Lecture>
             {
-                new Lecture() { Class = classes[0], RecordDate = DateTime.Today }
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-2) }
             };
 
             _context.Lectures.AddRange(lectures);
@@ -102,6 +104,11 @@ namespace UniWatch.Models
             // Associate some attendance for a lecture
             _context.Attendance.Add(new StudentAttendance() { Student = students[0], Lecture = lectures[0], Present = true });
             _context.Attendance.Add(new StudentAttendance() { Student = students[1], Lecture = lectures[0], Present = false });
+            _context.Attendance.Add(new StudentAttendance() { Student = students[0], Lecture = lectures[1], Present = true });
+            _context.Attendance.Add(new StudentAttendance() { Student = students[1], Lecture = lectures[1], Present = true });
+            _context.Attendance.Add(new StudentAttendance() { Student = students[0], Lecture = lectures[2], Present = false });
+            _context.Attendance.Add(new StudentAttendance() { Student = students[1], Lecture = lectures[2], Present = false });
+
             _context.SaveChanges();
 
             // Create some facial profiles for the students

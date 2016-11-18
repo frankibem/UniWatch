@@ -1,8 +1,58 @@
-﻿
+﻿@using UniWatch.Models
+@model IEnumerable<StudentAttendance>
+
 @{
-    ViewBag.Title = "Override";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Override</h2>
+<h2>Override Lecture - @ViewBag.LectureDate</h2>
+<hr />
 
+@{
+    if (!Model.Any())
+    {
+        <h4>There is no attendance for this lecture</h4>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Student</th>
+                <th class="text-center">Attendance</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+            @foreach (Student student in ViewBag.Students)
+            {
+                <tr>
+                    <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
+                    <td>
+                        @{
+                            var isPresent = Model
+                                .SingleOrDefault(a => a.Student.Id == student.Id)?
+                                .Present ?? false;
+                        }
+
+                        @(((UniWatch.Controllers.LectureController) this.ViewContext.Controller).GetAttendanceGlyphicon(isPresent))
+                    </td>
+                    <td>
+                        @Html.ActionLink(
+                                "Toggle",
+                                "Override",
+                                "Lecture",
+                                new
+                                {
+                                    lectureId = ViewBag.LectureId,
+                                    studentId = student.Id
+                                },
+                                null
+                            )
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}

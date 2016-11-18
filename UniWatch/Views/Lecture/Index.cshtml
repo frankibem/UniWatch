@@ -1,5 +1,5 @@
 ﻿@using UniWatch.Models
-@model IEnumerable<UniWatch.Models.Lecture>
+@model IEnumerable<Lecture>
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -15,13 +15,16 @@
     }
     else
     {
+        var lectures = Model.OrderByDescending(lecture => lecture.RecordDate);
+
         <table class="table table-striped">
             <thead>
             <tr>
                 <th>Student</th>
-                @foreach (var lecture in Model)
+
+                @foreach (var lecture in lectures)
                 {
-                    <th>
+                    <th class="text-center">
                         @Html.ActionLink(
                             lecture.RecordDate.ToShortDateString(),
                             "Override",
@@ -42,13 +45,13 @@
                 <tr>
                     <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
                     
-                    @foreach (var lecture in Model)
+                    @foreach (var lecture in lectures)
                     {
                         var isPresent = lecture.Attendance.
                             SingleOrDefault(a => a.Student.Id == student.Id && a.Lecture.Id == lecture.Id)?
                             .Present ?? false;
 
-                        <td>
+                        <td class="text-center">
                             @if (isPresent)
                             {
                                 <span class="glyphicon glyphicon-ok" style="color: green;"></span>
