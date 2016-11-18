@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -52,15 +53,38 @@ namespace UniWatch.Controllers
         /// </summary>
         /// <returns>The create view</returns>
         //[Authorize]
-        public ActionResult Create()
+        public ActionResult Create(int classId)
         {
-            return View();
+            // TODO: Create a lecture for the class given, upload pictures
+            var lecture = new Lecture()
+            {
+                Class = _manager.ClassManager.GetById(classId),
+                RecordDate = DateTime.Today
+            };
+
+            return View(lecture);
         }
 
         //[Authorize]
         [HttpPost]
         public ActionResult Create(Lecture lecture)
         {
+            if (Request.Files.Count > 0)
+            {
+                var file = Request.Files[0];
+
+                if (file != null && file.ContentLength > 0 /*&& file.ContentLength < MAX LENGTH*/)
+                {
+                    //var fileName = Path.GetFileName(file.FileName);
+                    //var path = Path.Combine(Server.MapPath("~/Images/"), fileName);
+                    //file.SaveAs(path);
+
+                    // TODO: Save images in blob, create images, create lecture in db
+
+                    return RedirectToAction("Index", "Lecture", new { lecture.Class.Id });
+                }
+            }
+
             return View();
         }
 
@@ -93,22 +117,6 @@ namespace UniWatch.Controllers
         public ActionResult Override(int lectureId, int studentId)
         {
             return View();
-        }
-
-        public HtmlString GetAttendanceGlyphicon(bool isOkay)
-        {
-            var cssClass = "remove";
-            var cssColor = "red";
-
-            if (isOkay)
-            {
-                cssClass = "ok";
-                cssColor = "green";
-            }
-
-            return new HtmlString(
-                $"<span class=\"glyphicon glyphicon-{cssClass}\" style=\"color: {cssColor};\"></span>"
-            );
         }
     }
 }

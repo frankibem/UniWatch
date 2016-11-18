@@ -9,6 +9,8 @@
 <hr />
 
 @{
+    @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, null)
+
     if (!Model.Any())
     {
         <h4>There are no lectures for this class</h4>

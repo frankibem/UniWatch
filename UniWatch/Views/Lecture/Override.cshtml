@@ -35,7 +35,14 @@
                                 .Present ?? false;
                         }
 
-                        @(((UniWatch.Controllers.LectureController) this.ViewContext.Controller).GetAttendanceGlyphicon(isPresent))
+                        @if (isPresent)
+                        {
+                            <span class="glyphicon glyphicon-ok" style="color: green;"></span>
+                        }
+                        else
+                        {
+                            <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                        }
                     </td>
                     <td>
                         @Html.ActionLink(
