@@ -7,7 +7,7 @@
 <h2>Index</h2>
 
 <p>
-    @Html.ActionLink("Add New Student", "Create")
+    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = 1}, null)
 </p>
 <table class="table">
     <tr>
@@ -29,7 +29,7 @@
             @Html.DisplayFor(modelItem => item.LastName)
         </td>
         <td>
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Delete", "UnEnroll", "Student", new { classId = 1, studentId = 4 }, null)
         </td>
     </tr>
 }

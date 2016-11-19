@@ -44,9 +44,11 @@ namespace UniWatch.Controllers
         }
 
         // GET: Get
+        [HttpGet]
         public ActionResult Get(int studentId)
         {
-            return View();
+            var student = _dataAccess.StudentManager.GetById(studentId);
+            return RedirectToAction("Index", new { studentId = studentId });
         }
 
         // POST: Unenroll

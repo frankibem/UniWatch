@@ -7,7 +7,7 @@ using UniWatch.Models;
 
 namespace UniWatch.ViewModels
 {
-    class EnrollViewModel
+    public class EnrollViewModel
     {
  
         public Class Class { get; set; }
