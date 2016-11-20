@@ -70,6 +70,11 @@ namespace UniWatch.Models
         public DateTime EnrollDate { get; set; }
 
         /// <summary>
+        /// The unique identifier for the student's Person in the PersonGroup
+        /// </summary>
+        public Guid PersonId { get; set; }
+
+        /// <summary>
         /// The class related to this enrollment
         /// </summary>
         public virtual Class Class { get; set; }

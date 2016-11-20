@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UniWatch.Models;
 
 namespace UniWatch.DataAccess
@@ -43,5 +45,13 @@ namespace UniWatch.DataAccess
         /// <param name="identity">The id underlying identity for the user</param>
         /// <returns>The User associated with the given identity</returns>
         User GetUser(string identityId);
+
+        /// <summary>
+        /// Sets the images that make up the facial profile for a student
+        /// </summary>
+        /// <param name="studentId">The id of the student</param>
+        /// <param name="images">The images that make up the profile</param>
+        /// <returns>The uploaded images</returns>
+        IEnumerable<UploadedImage> SetStudentProfile(int studentId, IEnumerable<Stream> images);
     }
 }

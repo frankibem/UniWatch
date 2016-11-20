@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniWatch.Models;
 
@@ -102,6 +104,32 @@ namespace UniWatch.DataAccess
                 return _db.Students.Where(s => s.IdentityId == identityId).FirstOrDefault();
 
             return teacher;
+        }
+
+        /// <summary>
+        /// Sets the images that make up the facial profile for a student
+        /// </summary>
+        /// <param name="studentId">The id of the student</param>
+        /// <param name="images">The images that make up the profile</param>
+        /// <returns>The uploaded images</returns>
+        public IEnumerable<UploadedImage> SetStudentProfile(int studentId, IEnumerable<Stream> images)
+        {
+            var student = GetStudentById(studentId);
+            if(student == null)
+                throw new InvalidOperationException("Error setting student profile");
+
+            // Store the images
+            var storageManager = new StorageManager();
+            List<UploadedImage> result = storageManager.SaveImages(images).Result;
+
+            // Update the facial profile
+            foreach(var image in result)
+            {
+                student.Profile.Images.Add(image);
+            }
+
+            _db.SaveChanges();
+            return result;
         }
 
         public void Dispose()
