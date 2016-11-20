@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniWatch.Models;
 using System.Data.Entity;
+using UniWatch.Services;
 
 namespace UniWatch.DataAccess
 {
@@ -59,11 +60,17 @@ namespace UniWatch.DataAccess
                 Number = number,
                 Section = section,
                 Semester = semester,
+                TrainingStatus = TrainingStatus.UnTrained,
                 Teacher = teacher
             };
 
             var added = _db.Classes.Add(newClass);
             _db.SaveChanges();
+
+            // Create the PersonGroup for this class
+            var faceClient = RecognitionService.GetFaceClient();
+            faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name).Wait();
+
             return added;
         }
 

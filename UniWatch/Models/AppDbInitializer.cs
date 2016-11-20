@@ -6,7 +6,7 @@ using System.Web;
 
 namespace UniWatch.Models
 {
-    public class AppDbInitializer : DropCreateDatabaseIfModelChanges<AppDbContext>
+    public class AppDbInitializer : DropCreateDatabaseAlways<AppDbContext>
     {
         protected override void Seed(AppDbContext context)
         {

@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using UniWatch.Models;
+using UniWatch.DataAccess;
 
 namespace UniWatch.Controllers
 {
@@ -17,15 +18,18 @@ namespace UniWatch.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private IDataAccess _dataAccess;
 
         public AccountController()
         {
+            _dataAccess = new DataAccess.DataAccess();
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, IDataAccess dataAccess)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            _dataAccess = dataAccess;
         }
 
         public ApplicationSignInManager SignInManager
@@ -155,6 +159,16 @@ namespace UniWatch.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    switch(model.UserType)
+                    {
+                        case UserType.Teacher:
+                            _dataAccess.UserManager.CreateTeacher(model.FirstName, model.LastName, user);
+                            break;
+                        case UserType.Student:
+                            _dataAccess.UserManager.CreateStudent(model.FirstName, model.LastName, user);
+                            break;
+                    }
+
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771

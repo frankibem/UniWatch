@@ -16,12 +16,6 @@ namespace UniWatch.Models
         public int Id { get; set; }
 
         /// <summary>
-        /// True if the recognizer has been trained to recognize the images in this profile.
-        /// False otherwise
-        /// </summary>
-        public bool RecognizerTrained { get; set; }
-
-        /// <summary>
         /// The student that this profile belongs to
         /// </summary>
         public virtual Student Student { get; set; }
