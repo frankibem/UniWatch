@@ -1,30 +1,27 @@
-﻿@using UniWatch.Models
-@model IEnumerable<Lecture>
+﻿@model UniWatch.ViewModels.Lecture.ReportViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@ViewBag.Title</h2>
+<h2>@Model.Class.Name</h2>
 <hr />
 
 @{
-    @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, null)
+    @*@Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, null)*@
 
-    if (!Model.Any())
+    if (!Model.Lectures.Any())
     {
         <h4>There are no lectures for this class</h4>
     }
     else
     {
-        var lectures = Model.OrderByDescending(lecture => lecture.RecordDate);
-
         <table class="table table-striped">
             <thead>
             <tr>
                 <th>Student</th>
 
-                @foreach (var lecture in lectures)
+                @foreach (var lecture in Model.Lectures)
                 {
                     <th class="text-center">
                         @Html.ActionLink(
@@ -36,21 +33,20 @@
                                 lectureId = lecture.Id
                             },
                             null
-                            )
+                        )
                     </th>
                 }
             </tr>
             </thead>
             <tbody>
-            @foreach (Student student in ViewBag.Students)
+            @foreach (var student in Model.Students)
             {
                 <tr>
                     <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
                     
-                    @foreach (var lecture in lectures)
+                    @foreach (var lecture in Model.Lectures)
                     {
-                        var isPresent = lecture.Attendance.
-                            SingleOrDefault(a => a.Student.Id == student.Id && a.Lecture.Id == lecture.Id)?
+                        var isPresent = Model.Attendance[lecture.Id].SingleOrDefault(a => a.Student.Id == student.Id)?
                             .Present ?? false;
 
                         <td class="text-center">

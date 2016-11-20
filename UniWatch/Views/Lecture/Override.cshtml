@@ -1,5 +1,4 @@
-﻿@using UniWatch.Models
-@model IEnumerable<StudentAttendance>
+﻿@model UniWatch.ViewModels.Lecture.LectureViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,8 +7,11 @@
 <h2>Override Lecture - @ViewBag.LectureDate</h2>
 <hr />
 
-@{
-    if (!Model.Any())
+@using (Html.BeginForm("Override", "Lecture", FormMethod.Post, new { model = Model })) {
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Lecture.Id);
+
+    if (!Model.Students.Any())
     {
         <h4>There is no attendance for this lecture</h4>
     }
@@ -24,42 +26,32 @@
             </thead>
             <tbody>
             
-            @foreach (Student student in ViewBag.Students)
+            @for(var i = 0; i < Model.Students.Count; i++)  
             {
                 <tr>
-                    <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
+                    <td>@string.Format($"{Model.Students[i].FirstName} {Model.Students[i].LastName}")</td>
                     <td>
-                        @{
-                            var isPresent = Model
-                                .SingleOrDefault(a => a.Student.Id == student.Id)?
-                                .Present ?? false;
+                        @* TODO: get this to pass the value of the attendance *@
+                        @for (var j = 0; j < Model.Lecture.Attendance.Count; j++)
+                        {
+                            if (Model.Lecture.Attendance.ElementAt(j).Student.Id == Model.Students[i].Id)
+                            {
+                                @Html.CheckBoxFor(model => model.Lecture.Attendance.ElementAt(j).Present)
+
+                                break;
+                            }
+
                         }
 
-                        @if (isPresent)
-                        {
-                            <span class="glyphicon glyphicon-ok" style="color: green;"></span>
-                        }
-                        else
-                        {
-                            <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                        }
-                    </td>
-                    <td>
-                        @Html.ActionLink(
-                                "Toggle",
-                                "Override",
-                                "Lecture",
-                                new
-                                {
-                                    lectureId = ViewBag.LectureId,
-                                    studentId = student.Id
-                                },
-                                null
-                            )
+                        @*@Html.CheckBoxFor(model => model.Lecture.Attendance.Single(a => a.Student.Id == Model.Students[i].Id).Present)*@
+
+                        @Html.HiddenFor(model => model.Students[i].Id)
                     </td>
                 </tr>
             }
             </tbody>
         </table>
+
+        <input type="submit" id="btnSubmit"/>
     }
 }

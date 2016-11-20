@@ -260,6 +260,8 @@
     <Compile Include="Models\UserModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\Lecture\LectureViewModel.cs" />
+    <Compile Include="ViewModels\Lecture\ReportViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -339,7 +341,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="Views\Sms\" />
   </ItemGroup>
   <ItemGroup>

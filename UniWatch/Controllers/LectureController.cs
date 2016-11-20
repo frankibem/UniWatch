@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using UniWatch.DataAccess;
 using UniWatch.Models;
+using UniWatch.ViewModels.Lecture;
 
 namespace UniWatch.Controllers
 {
@@ -27,94 +24,78 @@ namespace UniWatch.Controllers
         /// Display all the recorded lectures for the class
         /// </summary>
         /// <returns>The index view</returns>
-        //[Authorize]
+        [HttpGet]
         public ActionResult Index(int classId)
         {
-            // Get all the lectures for the class
-            var lectures = _manager.LectureManager.GetTeacherReport(classId);
+            var report = new ReportViewModel(classId, _manager);
 
-            // If there are no lectures for the class or the class does not exist,
+            // If the class does not exist,
             // then display an error
-            if (!lectures?.Any() ?? false)
+            if (report.Class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
 
-            // Put the class name and students into the ViewBag
-            // TODO: create a ViewModel for this later
-            ViewBag.Title = _manager.ClassManager.GetById(classId).Name;
-            ViewBag.Students = _manager.ClassManager.GetEnrolledStudents(classId).ToList();
-
-            return View(lectures);
+            return View(report);
         }
 
-        /// <summary>
-        /// Display the blank form to create a lecture
-        /// </summary>
-        /// <returns>The create view</returns>
-        //[Authorize]
-        public ActionResult Create(int classId)
+        [HttpGet]
+        public ActionResult Override(int lectureId)
         {
-            // TODO: Create a lecture for the class given, upload pictures
-            var lecture = new Lecture()
+            var lecture = new LectureViewModel(lectureId, _manager);
+
+            // If the lecture does not exist,
+            // then display an error
+            if (lecture.Lecture == null)
             {
-                Class = _manager.ClassManager.GetById(classId),
-                RecordDate = DateTime.Today
-            };
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
+            }
 
             return View(lecture);
         }
 
-        //[Authorize]
         [HttpPost]
-        public ActionResult Create(Lecture lecture)
+        [ValidateAntiForgeryToken]
+        public ActionResult Override(LectureViewModel model)
         {
-            if (Request.Files.Count > 0)
+            var lecture = _manager.LectureManager.Get(model.Lecture.Id);
+
+            if (lecture == null)
             {
-                var file = Request.Files[0];
-
-                if (file != null && file.ContentLength > 0 /*&& file.ContentLength < MAX LENGTH*/)
-                {
-                    //var fileName = Path.GetFileName(file.FileName);
-                    //var path = Path.Combine(Server.MapPath("~/Images/"), fileName);
-                    //file.SaveAs(path);
-
-                    // TODO: Save images in blob, create images, create lecture in db
-
-                    return RedirectToAction("Index", "Lecture", new { lecture.Class.Id });
-                }
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {model.Lecture.Id}");
             }
 
+            foreach (var s in model.Students)
+            {
+                lecture.Attendance.First(a => a.Student.Id == s.Id).Present =
+                    model.Lecture.Attendance.First(a => a.Student.Id == s.Id).Present;
+            }
+
+            _manager.LectureManager.Update(lecture);
+
+            return RedirectToAction("Override", new { lectureId = lecture.Id });
+        }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
             return View();
         }
 
-        //[Authorize]
         [HttpPost]
+        public ActionResult Create(Lecture lecture)
+        {
+            return View();
+        }
+
+        [HttpGet]
         public ActionResult Delete(int lectureId)
         {
             return View();
         }
 
-        //[Authorize]
-        public ActionResult Override(int lectureId)
-        {
-            var lecture = _manager.LectureManager.Get(lectureId);
-
-            if (lecture == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
-            }
-
-            ViewBag.LectureId = lectureId;
-            ViewBag.LectureDate = lecture.RecordDate.ToShortDateString();
-            ViewBag.Students = _manager.ClassManager.GetEnrolledStudents(lecture.Class.Id).ToList();
-
-            return View(lecture.Attendance);
-        }
-
-        //[Authorize]
         [HttpPost]
-        public ActionResult Override(int lectureId, int studentId)
+        public ActionResult Delete(Lecture lecture)
         {
             return View();
         }
