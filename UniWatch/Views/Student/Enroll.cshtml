@@ -14,7 +14,8 @@
     <div class="container">
         <div class="row">
             <div class="search">
-                <input type="text" class="form-control input-sm" maxlength="64" placeholder="Search" /> <button type="submit" class="btn btn-primary btn-sm">Find</button>
+                <input id="studentId" name="studentId" type="text" class="form-control input-sm" maxlength="64" placeholder="Search" /> @*@*<button type="submit" class="btn btn-primary btn-sm">Find</button>*@*@
+                @Html.ActionLink("Find", "Enroll", "Student", new { classId = Model.Class.Id }, new { CssClass= "btn btn-primary btn-sm" } )
             </div>
         </div>
     </div>

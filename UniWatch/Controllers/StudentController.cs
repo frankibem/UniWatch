@@ -14,12 +14,17 @@ namespace UniWatch.Controllers
         
         public StudentController()
         {
+            // Initialize the DataAccess object. DataAccess allows you to access the class manager and student manager 
+            // without the need to directly access the database.
             _dataAccess = new DataAccess.DataAccess();
         } 
 
         // GET: Student
+        //The Index function takes a classId as a parameter
+        [HttpGet]
         public ActionResult Index(int classId)
         {
+            //The classI
             var students = _dataAccess.ClassManager.GetEnrolledStudents(classId);
             return View(students);
         }
@@ -41,6 +46,15 @@ namespace UniWatch.Controllers
             var @class = _dataAccess.ClassManager.GetById(classId);
             //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
             return View(new EnrollViewModel() { Class = @class });
+        }
+
+        [HttpGet]
+        public ActionResult Enroll(int classId, int studentId)
+        {
+            var @class = _dataAccess.ClassManager.GetById(classId);
+            var student = _dataAccess.StudentManager.GetById(studentId);
+            //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
+            return View(new EnrollViewModel() { Class = @class, Student = student });
         }
 
         // GET: Get

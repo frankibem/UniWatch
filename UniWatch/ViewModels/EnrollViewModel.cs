@@ -11,5 +11,6 @@ namespace UniWatch.ViewModels
     {
  
         public Class Class { get; set; }
+        public Student Student { get; set; }
     }
 }
