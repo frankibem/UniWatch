@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Configuration;
@@ -45,10 +46,12 @@ namespace UniWatch.Models
             };
             CreateUsersAndAddToRole(teacherList, teacherRole);
 
-            var teachers = new List<Teacher>();
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Temple", "Witman", teacherList[0]));
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Daniel", "Payne", teacherList[1]));
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Elton", "Grice", teacherList[2]));
+            var teachers = new List<Teacher>
+            {
+                _dataAccess.UserManager.CreateTeacher("Temple", "Witman", teacherList[0]),
+                _dataAccess.UserManager.CreateTeacher("Daniel", "Payne", teacherList[1]),
+                _dataAccess.UserManager.CreateTeacher("Elton", "Grice", teacherList[2])
+            };
 
             // Create some students
             var studentList = new List<ApplicationUser>
@@ -60,11 +63,13 @@ namespace UniWatch.Models
             };
             CreateUsersAndAddToRole(studentList, studentRole);
 
-            var students = new List<Student>();
-            students.Add(_dataAccess.UserManager.CreateStudent("Joshua", "Hernandez", studentList[0]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Frank", "Ibem", studentList[1]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Claire", "Gray", studentList[2]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Patrick", "Tone", studentList[3]));
+            var students = new List<Student>
+            {
+                _dataAccess.UserManager.CreateStudent("Joshua", "Hernandez", studentList[0]),
+                _dataAccess.UserManager.CreateStudent("Frank", "Ibem", studentList[1]),
+                _dataAccess.UserManager.CreateStudent("Claire", "Gray", studentList[2]),
+                _dataAccess.UserManager.CreateStudent("Patrick", "Tone", studentList[3])
+            };
 
             // Create some classes
             _dataAccess.ClassManager.CreateClass("Data Structures", 2413, "001", Semester.Fall, 2016, teachers[0].Id);
@@ -78,8 +83,33 @@ namespace UniWatch.Models
             _dataAccess.ClassManager.EnrollStudent(classes[1].Id, students[0].Id);
             _dataAccess.ClassManager.EnrollStudent(classes[2].Id, students[0].Id);
 
+            // Hold some lectures
+            var lectures = new List<Lecture>
+            {
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-1) },
+                new Lecture() { Class = classes[1], RecordDate = DateTime.Today.AddDays(-1) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-9) }
+            };
+            _context.Lectures.AddRange(lectures);
             _context.SaveChanges();
-            base.Seed(context);
+
+            // Take some attendance
+            var attendance = new List<StudentAttendance>
+            {
+                new StudentAttendance() { Lecture = lectures[0], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[0], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[0], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[1], Present = true },
+                new StudentAttendance() { Lecture = lectures[1], Student = students[0], Present = false}
+            };
+            _context.Attendance.AddRange(attendance);
+            _context.SaveChanges();
+
+            _context.SaveChanges();
+            base.Seed(_context);
         }
 
         /// <summary>
