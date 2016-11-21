@@ -8,7 +8,7 @@ namespace UniWatch.DataAccess
         private AppDbContext _db;
         private IClassManager _classManager;
         private ILectureManager _lectureManager;
-        private IStudentManager _studentManager;
+        private IUserManager _userManager;
 
         /// <summary>
         /// The class manager for class related functionality
@@ -51,22 +51,22 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
-        /// The class manager for student related functionality
+        /// The manager for user related functionality
         /// </summary>
-        public IStudentManager StudentManager
+        public IUserManager UserManager
         {
             get
             {
-                if(_studentManager == null)
+                if(_userManager == null)
                 {
-                    _studentManager = new StudentManager(_db);
+                    _userManager = new UserManager(_db);
                 }
-                return _studentManager;
+                return _userManager;
             }
 
             protected set
             {
-                _studentManager = value;
+                _userManager = value;
             }
         }
 
@@ -90,12 +90,12 @@ namespace UniWatch.DataAccess
         /// </summary>
         /// <param name="classManager"></param>
         /// <param name="lectureManager"></param>
-        /// <param name="studentManager"></param>
-        public DataAccess(IClassManager classManager, ILectureManager lectureManager, IStudentManager studentManager)
+        /// <param name="userManager"></param>
+        public DataAccess(IClassManager classManager, ILectureManager lectureManager, IUserManager userManager)
         {
             _classManager = classManager;
             _lectureManager = lectureManager;
-            _studentManager = StudentManager;         
+            _userManager = userManager;         
         }
 
         #region IDisposable Support
@@ -110,7 +110,7 @@ namespace UniWatch.DataAccess
                     _db.Dispose();
                     _lectureManager = null;
                     _classManager = null;
-                    _studentManager = null;
+                    _userManager = null;
                 }
 
                 disposed = true;

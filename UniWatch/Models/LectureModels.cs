@@ -33,6 +33,12 @@ namespace UniWatch.Models
         /// The list of attendance information for this lecture
         /// </summary>
         public virtual ICollection<StudentAttendance> Attendance { get; set; }
+
+        public Lecture()
+        {
+            Images = new List<UploadedImage>();
+            Attendance = new List<StudentAttendance>();
+        }
     }
 
     /// <summary>
