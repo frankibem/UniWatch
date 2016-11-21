@@ -233,6 +233,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="DataAccess\UserManager.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -241,11 +242,11 @@
     <Compile Include="DataAccess\IClassManager.cs" />
     <Compile Include="DataAccess\IDataAccess.cs" />
     <Compile Include="DataAccess\ILectureManager.cs" />
-    <Compile Include="DataAccess\IStudentManager.cs" />
     <Compile Include="DataAccess\LectureManager.cs" />
     <Compile Include="DataAccess\StorageManager.cs" />
-    <Compile Include="DataAccess\StudentManager.cs" />
+    <Compile Include="DataAccess\IUserManager.cs" />
     <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\RecognitionService.cs" />
     <Compile Include="Services\SmsService.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AppDbContext.cs" />
