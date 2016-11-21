@@ -34,7 +34,7 @@ namespace UniWatch.Controllers
         public ActionResult UnEnroll(int classId, int studentId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            var student = _dataAccess.StudentManager.GetById(studentId);
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
 
             return View(new UnEnrollViewModel() { Class = @class, Student = student });
         }
@@ -52,7 +52,7 @@ namespace UniWatch.Controllers
         public ActionResult Enroll(int classId, int studentId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            var student = _dataAccess.StudentManager.GetById(studentId);
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
             //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
             return View(new EnrollViewModel() { Class = @class, Student = student });
         }
@@ -61,7 +61,7 @@ namespace UniWatch.Controllers
         [HttpGet]
         public ActionResult Get(int studentId)
         {
-            var student = _dataAccess.StudentManager.GetById(studentId);
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
             return RedirectToAction("Index", new { studentId = studentId });
         }
 
