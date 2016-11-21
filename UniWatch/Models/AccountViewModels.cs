@@ -65,6 +65,25 @@ namespace UniWatch.Models
     public class RegisterViewModel
     {
         [Required]
+        [Display(Name = "First Name")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "Enter your first name.")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        [StringLength(100, MinimumLength = 1, ErrorMessage = "Enter your last name.")]
+        public string LastName { get; set; }
+
+        [Phone]
+        [Required]
+        [Display(Name = "Phone #")]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        [Display(Name = "I am a")]
+        public UserType UserType { get; set; }
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
@@ -79,6 +98,15 @@ namespace UniWatch.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+    }
+
+    /// <summary>
+    /// Constants for different types of Users
+    /// </summary>
+    public enum UserType
+    {
+        Student,
+        Teacher
     }
 
     public class ResetPasswordViewModel

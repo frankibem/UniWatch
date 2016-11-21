@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UniWatch.Models
 {
@@ -8,7 +9,6 @@ namespace UniWatch.Models
     /// </summary>
     public class User
     {
-        [Required]
         public int Id { get; set; }
 
         /// <summary>
@@ -25,11 +25,8 @@ namespace UniWatch.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        /// <summary>
-        /// The Identity information related to this user (e.g. email, phone, ...)
-        /// </summary>
         [Required]
-        public ApplicationUser Identity { get; set; }
+        public string IdentityId { get; set; }
     }
 
     /// <summary>
