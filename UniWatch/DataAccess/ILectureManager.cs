@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UniWatch.Models;
 
 namespace UniWatch.DataAccess
@@ -48,5 +49,12 @@ namespace UniWatch.DataAccess
         /// <param name="lectureId">The id of the lecture to delete</param>
         /// <returns>The deleted lecture</returns>
         Lecture Delete(int lectureId);
+
+        /// <summary>
+        /// Record a new lecture for the given class using the given images
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        /// <param name="images">The images to detect students from</param>
+        Lecture RecordLecture(int classId, IEnumerable<Stream> images);
     }
 }

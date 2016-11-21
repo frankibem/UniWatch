@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using Microsoft.Ajax.Utilities;
 using UniWatch.DataAccess;
@@ -93,10 +95,10 @@ namespace UniWatch.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {model.Lecture.Id}");
             }
 
-            foreach (var s in model.Students)
+            foreach (var student in model.Students)
             {
-                lecture.Attendance.First(a => a.Student.Id == s.Id).Present =
-                    model.Lecture.Attendance.First(a => a.Student.Id == s.Id).Present;
+                lecture.Attendance.First(a => a.Student.Id == student.Id).Present =
+                    model.Lecture.Attendance.First(a => a.Student.Id == student.Id).Present;
             }
 
             _manager.LectureManager.Update(lecture);
@@ -109,15 +111,49 @@ namespace UniWatch.Controllers
         #region Create
 
         [HttpGet]
-        public ActionResult Create()
+        public ActionResult Create(int classId)
         {
-            return View();
+            var @class = _manager.ClassManager.GetById(classId);
+
+            if (@class == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+            }
+
+            var lecture = new Lecture() { Class = @class };
+
+            return View(lecture);
         }
 
         [HttpPost]
         public ActionResult Create(Lecture lecture)
         {
-            return View();
+            if (lecture.Class == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "No class id");
+            }
+
+            if (Request.Files.Count == 0)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "No files selected");
+            }
+
+            var fileStreams = new List<Stream>(Request.Files.Count);
+
+            foreach (HttpPostedFileBase file in Request.Files)
+            {
+                if (file.ContentLength == 0 /*&& file.ContentLength >= MAX_SIZE*/)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"Selected file {file.FileName} is out of bounds");
+                }
+
+                fileStreams.Add(file.InputStream);
+            }
+
+            _manager.LectureManager.RecordLecture(lecture.Class.Id, fileStreams);
+            // TODO: while the system is creating the lecture and taking attendance, display a load screen
+
+            return RedirectToAction("Index", "Lecture", new { classId = lecture.Class.Id });
         }
 
         #endregion
@@ -127,13 +163,27 @@ namespace UniWatch.Controllers
         [HttpGet]
         public ActionResult Delete(int lectureId)
         {
-            return View();
+            var lvm = GetLectureViewModel(lectureId);
+
+            if (lvm.Lecture == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
+            }
+
+            return View(lvm);
         }
 
         [HttpPost]
-        public ActionResult Delete(Lecture lecture)
+        public ActionResult Delete(LectureViewModel lvm)
         {
-            return View();
+            if (lvm.Lecture == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture given");
+            }
+
+            var lecture = _manager.LectureManager.Delete(lvm.Lecture.Id);
+
+            return RedirectToAction("Index", new { classId = lecture.Class.Id });
         }
 
         #endregion

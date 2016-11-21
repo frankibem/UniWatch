@@ -1,4 +1,5 @@
-﻿@{
+﻿@model UniWatch.Models.Lecture
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -8,4 +9,5 @@
 {
     <input type="file" name="file" />
     <input type="submit" name="Submit" id="Submit" value="Upload" />
+    @Html.HiddenFor(model => model.Class.Id)
 }

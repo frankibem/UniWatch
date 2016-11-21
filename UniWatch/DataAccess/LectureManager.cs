@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Configuration;
+using Microsoft.Ajax.Utilities;
 using UniWatch.Models;
 using UniWatch.Services;
 
@@ -97,7 +98,7 @@ namespace UniWatch.DataAccess
             var existing = _db.Lectures.Find(lectureId);
 
             if(existing == null)
-                throw new InvalidOperationException("Error deleting class.");
+                throw new InvalidOperationException("Error deleting lecture.");
 
             return _db.Lectures.Remove(existing);
 
@@ -111,8 +112,8 @@ namespace UniWatch.DataAccess
         /// <returns>The created lecture</returns>
         public Lecture Create(Lecture lecture)
         {
-            // TODO: Implemente Create Lecture
-            return null;
+            // TODO: shouldn't this method do the same thing that RecordLecture does?
+            throw new NotImplementedException();
         }
 
         /// <summary>
