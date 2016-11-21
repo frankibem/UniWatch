@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using RestSharp.Extensions;
+using System.Web.Configuration;
 using UniWatch.Models;
+using UniWatch.Services;
 
 namespace UniWatch.DataAccess
 {
@@ -51,8 +53,7 @@ namespace UniWatch.DataAccess
         public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
             return _db.Lectures.
-                Where(lecture => lecture.Class.Id == classId)
-                .Include(lecture => lecture.Attendance);
+                Where(lecture => lecture.Class.Id == classId);
         }
 
         /// <summary>
@@ -112,6 +113,96 @@ namespace UniWatch.DataAccess
         {
             // TODO: Implemente Create Lecture
             return null;
+        }
+
+        /// <summary>
+        /// Record a new lecture for the given class using the given images
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        /// <param name="images">The images to detect students from</param>
+        public Lecture RecordLecture(int classId, IEnumerable<Stream> images)
+        {
+            var @class = _db.Classes.Find(classId);
+
+            if(@class == null)
+                throw new InvalidOperationException("Error training recognizer");
+            else if(@class.TrainingStatus != TrainingStatus.Trained)
+                throw new InvalidOperationException("Cannot record using untrained recognizer");
+
+            var lecture = new Lecture()
+            {
+                Class = @class,
+                RecordDate = DateTime.Now
+            };
+
+            // Save the images in Azure Storage
+            var storageManager = new StorageManager();
+            var uploadedImages = storageManager.SaveImages(images).Result;
+
+            foreach(var image in uploadedImages)
+                lecture.Images.Add(image);
+
+            // Detect the faces in the images
+            var recognitionService = new RecognitionService();
+            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages).Result;
+
+            // Create StudentAttendance for each student in class
+            var enrollments = _db.Enrollments.Where(e => e.Class.Id == classId)
+                .Include(e => e.Student);
+            Dictionary<Guid, StudentAttendance> attendanceMap = new Dictionary<Guid, StudentAttendance>();
+            foreach(var enrollment in enrollments)
+            {
+                var attendance = new StudentAttendance
+                {
+                    Lecture = lecture,
+                    Student = enrollment.Student,
+                    Present = false
+                };
+                lecture.Attendance.Add(attendance);
+                attendanceMap.Add(enrollment.PersonId, attendance);
+            }
+
+            // Mark detected students as present
+            foreach(var personId in personIds)
+                attendanceMap[personId].Present = true;
+
+            _db.Lectures.Add(lecture);
+            _db.SaveChanges();
+
+            // Alert absent students
+            var absent = lecture.Attendance.Where(a => !a.Present)
+                .Select(a => a.Student);
+            AlertAbsentStudents(absent, @class);
+
+            return lecture;
+        }
+
+        /// <summary>
+        /// Alert the given students via email and sms of their absence
+        /// </summary>
+        /// <param name="students">The students to alert</param>
+        /// <param name="class">The class to alert students for</param>
+        private void AlertAbsentStudents(IEnumerable<Student> students, Class @class)
+        {
+            EmailService emailService = new EmailService();
+            SmsService smsService = new SmsService();
+            List<Task> tasks = new List<Task>();
+
+            var fromEmail = WebConfigurationManager.AppSettings["EmailFrom"];
+            var fromSms = WebConfigurationManager.AppSettings["TwilioSmsNumber"];
+            string subject = $"Attendance Information for for \"{@class.Name}\"";
+            string message = $"You have been marked absent for \"{@class.Name}\" on {DateTime.Now.ToShortDateString()}";
+
+            foreach(var student in students)
+            {
+                var user = _db.Users.Find(student.IdentityId);
+                if(user != null)
+                {
+                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, "Attendance Information", message));
+                    smsService.SendMessage("", user.PhoneNumber, message);
+                }
+            }
+            Task.WaitAll(tasks.ToArray());
         }
 
         public void Dispose()

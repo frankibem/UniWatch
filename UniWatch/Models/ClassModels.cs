@@ -9,13 +9,11 @@ namespace UniWatch.Models
     /// </summary>
     public class Class
     {
-        [Required]
         public int Id { get; set; }
 
         /// <summary>
         /// The name of this course
         /// </summary>
-        [Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -39,6 +37,11 @@ namespace UniWatch.Models
         public int Year { get; set; }
 
         /// <summary>
+        /// The training status for the PersonGroup associated with this class
+        /// </summary>
+        public TrainingStatus TrainingStatus { get; set; }
+
+        /// <summary>
         /// The teacher in charge of this class
         /// </summary>
         public virtual Teacher Teacher { get; set; }
@@ -59,25 +62,26 @@ namespace UniWatch.Models
     /// </summary>
     public class Enrollment
     {
-        [Required]
         public int Id { get; set; }
 
         /// <summary>
         /// The date on which this student was enrolled in the class
         /// </summary>
-        [Required]
         public DateTime EnrollDate { get; set; }
+
+        /// <summary>
+        /// The unique identifier for the student's Person in the PersonGroup
+        /// </summary>
+        public Guid PersonId { get; set; }
 
         /// <summary>
         /// The class related to this enrollment
         /// </summary>
-        [Required]
         public virtual Class Class { get; set; }
 
         /// <summary>
         /// The student related to this enrollment
         /// </summary>
-        [Required]
         public virtual Student Student { get; set; }
     }
 
@@ -90,5 +94,24 @@ namespace UniWatch.Models
         Summer1,
         Summer2,
         Fall
+    }
+
+    /// <summary>
+    /// Constants for training status of a PersonGroup
+    /// </summary>
+    public enum TrainingStatus
+    {
+        /// <summary>
+        /// The PersonGroup has never been trained or needs to be trained due to a change
+        /// </summary>
+        UnTrained,
+        /// <summary>
+        /// Training is currently in progress
+        /// </summary>
+        Training,
+        /// <summary>
+        /// The PersonGroup has been trained and can be used
+        /// </summary>
+        Trained
     }
 }

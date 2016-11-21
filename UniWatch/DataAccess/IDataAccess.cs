@@ -1,4 +1,5 @@
 ﻿using System;
+using UniWatch.Models;
 
 namespace UniWatch.DataAccess
 {
@@ -8,18 +9,18 @@ namespace UniWatch.DataAccess
     public interface IDataAccess : IDisposable
     {
         /// <summary>
-        /// The class manager for class related functionality
+        /// The manager for class related functionality
         /// </summary>
         IClassManager ClassManager { get; }
 
         /// <summary>
-        /// The class manager for lecture related functionality
+        /// The manager for lecture related functionality
         /// </summary>
         ILectureManager LectureManager { get; }
 
         /// <summary>
-        /// The class manager for student related functionality
+        /// The manager for user related functionality
         /// </summary>
-        IStudentManager StudentManager { get; }
+        IUserManager UserManager { get; }
     }
 }

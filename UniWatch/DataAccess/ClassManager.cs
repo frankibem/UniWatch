@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UniWatch.Models;
 using System.Data.Entity;
+using UniWatch.Services;
 
 namespace UniWatch.DataAccess
 {
@@ -59,11 +60,17 @@ namespace UniWatch.DataAccess
                 Number = number,
                 Section = section,
                 Semester = semester,
+                TrainingStatus = TrainingStatus.UnTrained,
                 Teacher = teacher
             };
 
             var added = _db.Classes.Add(newClass);
             _db.SaveChanges();
+
+            // Create the PersonGroup for this class
+            var faceClient = RecognitionService.GetFaceClient();
+            faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name).Wait();
+
             return added;
         }
 
@@ -120,17 +127,24 @@ namespace UniWatch.DataAccess
             if(existing != null)
                 throw new InvalidOperationException("Error enrolling student");
 
-            var toAdd = new Enrollment
+            var enrollment = new Enrollment
             {
                 Class = @class,
                 EnrollDate = DateTime.Now,
                 Student = student
             };
+            _db.Enrollments.Add(enrollment);
 
-            _db.Enrollments.Add(toAdd);
+            // Create the Person for this student
+            var faceClient = RecognitionService.GetFaceClient();
+            var result = faceClient.CreatePersonAsync(classId.ToString(), student.FirstName).Result;
+
+            // Update training status for class
+            enrollment.PersonId = result.PersonId;
+            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
             _db.SaveChanges();
 
-            return toAdd;
+            return enrollment;
         }
 
         /// <summary>
@@ -142,14 +156,26 @@ namespace UniWatch.DataAccess
         public Enrollment UnEnrollStudent(int classId, int studentId)
         {
             var enrollment = _db.Enrollments
+                .Include(e => e.Class)
                 .FirstOrDefault(e => e.Class.Id == classId && e.Student.Id == studentId);
 
             if(enrollment == null)
                 throw new InvalidOperationException("Error unenrolling student");
 
-            return _db.Enrollments.Remove(enrollment);
+            // Delete the Person object from the PersonGroup
+            var faceClient = RecognitionService.GetFaceClient();
+            faceClient.DeletePersonAsync(classId.ToString(), enrollment.PersonId);
 
-            // TODO: Delete all other student related data
+            // Remove all attendance and enrollment information
+            var attendance = _db.Attendance.Where(a => a.Student.Id == studentId);
+            _db.Attendance.RemoveRange(attendance);
+            _db.Enrollments.Remove(enrollment);
+
+            // Update training status for class
+            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
+            _db.SaveChanges();
+
+            return enrollment;
         }
 
         /// <summary>
@@ -177,6 +203,24 @@ namespace UniWatch.DataAccess
             return _db.Classes.Remove(existing);
 
             // TODO: Delete all other class related data (Lectures, Enrollments)
+        }
+
+        /// <summary>
+        /// Train the recognizer for the given class
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        public void TrainRecognizer(int classId)
+        {
+            var @class = GetById(classId);
+
+            if(@class == null)
+                throw new InvalidOperationException("Error training recognizer");
+
+            if(@class.TrainingStatus != TrainingStatus.UnTrained)
+                return;
+
+            var recognitionService = new RecognitionService();
+            recognitionService.TrainRecognizer(classId.ToString()).Wait();
         }
 
         public void Dispose()

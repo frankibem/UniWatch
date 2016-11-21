@@ -73,7 +73,7 @@ namespace UniWatch.DataAccess
         /// </summary>
         /// <param name="images">The images to save to storage</param>
         /// <returns>A list of uploaded imagees for each image saved</returns>
-        public async Task<List<UploadedImage>> SaveImages(List<Stream> images)
+        public async Task<List<UploadedImage>> SaveImages(IEnumerable<Stream> images)
         {
             List<UploadedImage> result = new List<UploadedImage>();
             if(images == null)
