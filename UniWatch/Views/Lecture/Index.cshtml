@@ -4,11 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@Model.Class.Name</h2>
+<h2>@Model.ClassName</h2>
 <hr />
 
 @{
-    @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, null)
+    @Html.ActionLink("New Lecture", "Create", "Lecture", new {classId = Request.QueryString["classId"]}, null)
 
     if (!Model.Lectures.Any())
     {
@@ -33,24 +33,25 @@
                                 lectureId = lecture.Id
                             },
                             null
-                        )
+                            )
                     </th>
                 }
             </tr>
             </thead>
             <tbody>
-            @foreach (var student in Model.Students)
+            @foreach (var status in Model.Statuses)
             {
                 <tr>
-                    <td>@string.Format($"{student.FirstName} {student.LastName}")</td>
-                    
+                    <td>@string.Format($"{status.Student.FirstName} {status.Student.LastName}")</td>
+
                     @foreach (var lecture in Model.Lectures)
                     {
-                        var isPresent = Model.Attendance[lecture.Id].SingleOrDefault(a => a.Student.Id == student.Id)?
-                            .Present ?? false;
-
                         <td class="text-center">
-                            @if (isPresent)
+                            @if (!status.Attendance.ContainsKey(lecture.Id))
+                            {
+                                <span class="glyphicon glyphicon-minus" style="color: cornflowerblue;"></span>
+                            }
+                            else if (status.Attendance[lecture.Id])
                             {
                                 <span class="glyphicon glyphicon-ok" style="color: green;"></span>
                             }
@@ -60,7 +61,7 @@
                             }
                         </td>
                     }
-                </tr>  
+                </tr>
             }
             </tbody>
         </table>

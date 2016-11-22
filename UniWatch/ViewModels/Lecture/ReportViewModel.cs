@@ -1,16 +1,30 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using UniWatch.DataAccess;
 using UniWatch.Models;
-using WebGrease.Css.Extensions;
 
 namespace UniWatch.ViewModels.Lecture
 {
     public class ReportViewModel
     {
-        public IEnumerable<Student> Students { get; set; }
-        public Dictionary<int, ICollection<StudentAttendance>> Attendance { get; set; }
-        public IEnumerable<Models.Lecture> Lectures { get; set; }
-        public Class Class { get; set; }
+        public int ClassId { get; set; }
+        public string ClassName { get; set; }
+        public List<Models.Lecture> Lectures { get; set; }
+        public List<AttendanceStatus> Statuses { get; set; }
+
+        public ReportViewModel()
+        {
+            Lectures = new List<Models.Lecture>();
+            Statuses = new List<AttendanceStatus>();
+        }
+    }
+
+    public class AttendanceStatus
+    {
+        public Student Student { get; set; }
+        public Dictionary<int, bool> Attendance { get; set; }
+
+        public AttendanceStatus()
+        {
+            Attendance = new Dictionary<int, bool>();
+        }
     }
 }

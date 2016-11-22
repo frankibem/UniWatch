@@ -82,6 +82,7 @@ namespace UniWatch.DataAccess
             if(existing == null)
                 throw new InvalidOperationException("Error updating lecture");
 
+            _db.Lectures.Attach(lecture);
             _db.Entry(lecture).State = EntityState.Modified;
             _db.SaveChanges();
 
