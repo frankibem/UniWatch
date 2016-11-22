@@ -47,10 +47,16 @@ namespace UniWatch.Controllers
 
             // If the class does not exist,
             // then display an error
-            if (report == null)
+            if(report == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
+
+            var updates = new List<UpdateLectureItem>
+            {
+                new UpdateLectureItem { StudentId = 1, LectureId = 1, Present = true }
+            };
+            _manager.LectureManager.Update(1, updates);
 
             return View(report);
         }
@@ -71,7 +77,7 @@ namespace UniWatch.Controllers
 
             // If the lecture does not exist,
             // then display an error
-            if (lecture.Lecture == null)
+            if(lecture.Lecture == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
             }
@@ -88,22 +94,25 @@ namespace UniWatch.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Override(LectureViewModel model)
         {
-            var lecture = _manager.LectureManager.Get(model.Lecture.Id);
+            //var lecture = _manager.LectureManager.Get(model.Lecture.Id);
 
-            if (lecture == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {model.Lecture.Id}");
-            }
+            //if (lecture == null)
+            //{
+            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {model.Lecture.Id}");
+            //}
 
-            foreach (var student in model.Students)
-            {
-                lecture.Attendance.First(a => a.Student.Id == student.Id).Present =
-                    model.Lecture.Attendance.First(a => a.Student.Id == student.Id).Present;
-            }
+            //foreach (var student in model.Students)
+            //{
+            //    lecture.Attendance.First(a => a.Student.Id == student.Id).Present =
+            //        model.Lecture.Attendance.First(a => a.Student.Id == student.Id).Present;
+            //}
 
-            _manager.LectureManager.Update(lecture);
+            //_manager.LectureManager.Update(lecture);
 
-            return RedirectToAction("Override", new { lectureId = lecture.Id });
+            //return RedirectToAction("Override", new { lectureId = lecture.Id });
+
+            // TODO: Delete this line
+            return View("Index", 0);
         }
 
         #endregion
@@ -115,7 +124,7 @@ namespace UniWatch.Controllers
         {
             var @class = _manager.ClassManager.GetById(classId);
 
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
@@ -128,21 +137,21 @@ namespace UniWatch.Controllers
         [HttpPost]
         public ActionResult Create(Lecture lecture)
         {
-            if (lecture.Class == null)
+            if(lecture.Class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "No class id");
             }
 
-            if (Request.Files.Count == 0)
+            if(Request.Files.Count == 0)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "No files selected");
             }
 
             var fileStreams = new List<Stream>(Request.Files.Count);
 
-            foreach (HttpPostedFileBase file in Request.Files)
+            foreach(HttpPostedFileBase file in Request.Files)
             {
-                if (file.ContentLength == 0 /*&& file.ContentLength >= MAX_SIZE*/)
+                if(file.ContentLength == 0 /*&& file.ContentLength >= MAX_SIZE*/)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"Selected file {file.FileName} is out of bounds");
                 }
@@ -165,7 +174,7 @@ namespace UniWatch.Controllers
         {
             var lvm = GetLectureViewModel(lectureId);
 
-            if (lvm.Lecture == null)
+            if(lvm.Lecture == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
             }
@@ -176,7 +185,7 @@ namespace UniWatch.Controllers
         [HttpPost]
         public ActionResult Delete(LectureViewModel lvm)
         {
-            if (lvm.Lecture == null)
+            if(lvm.Lecture == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture given");
             }
@@ -204,7 +213,7 @@ namespace UniWatch.Controllers
 
             // If a class was found,
             // then add the other required information
-            if (@class != null)
+            if(@class != null)
             {
                 report = new ReportViewModel
                 {
@@ -226,7 +235,7 @@ namespace UniWatch.Controllers
             LectureViewModel lvm = null;
             var lecture = _manager.LectureManager.Get(lectureId);
 
-            if (lecture != null)
+            if(lecture != null)
             {
                 lvm = new LectureViewModel
                 {
