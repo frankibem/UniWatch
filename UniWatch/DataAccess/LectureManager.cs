@@ -113,6 +113,7 @@ namespace UniWatch.DataAccess
             }
 
 
+            _db.Lectures.Attach(lecture);
             _db.Entry(lecture).State = EntityState.Modified;
             _db.SaveChanges();
 

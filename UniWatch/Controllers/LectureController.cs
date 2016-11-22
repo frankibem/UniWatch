@@ -73,46 +73,52 @@ namespace UniWatch.Controllers
         [HttpGet]
         public ActionResult Override(int lectureId)
         {
-            var lecture = GetLectureViewModel(lectureId);
+            var lvm = GetLectureViewModel(lectureId);
 
             // If the lecture does not exist,
             // then display an error
-            if(lecture.Lecture == null)
+            if (lvm == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
             }
 
-            return View(lecture);
+            return View(lvm);
         }
 
         /// <summary>
         /// Updates the student attendance for a lecture
         /// </summary>
-        /// <param name="model">The updated lecture view model</param>
+        /// <param name="lvm">The updated lecture view model</param>
         /// <returns>The updated override view</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Override(LectureViewModel model)
+        public ActionResult Override(LectureViewModel lvm)
         {
-            //var lecture = _manager.LectureManager.Get(model.Lecture.Id);
+            var lecture = _manager.LectureManager.Get(lvm.LectureId);
 
-            //if (lecture == null)
-            //{
-            //    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {model.Lecture.Id}");
-            //}
+            if (lecture == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lvm.LectureId}");
+            }
 
-            //foreach (var student in model.Students)
-            //{
-            //    lecture.Attendance.First(a => a.Student.Id == student.Id).Present =
-            //        model.Lecture.Attendance.First(a => a.Student.Id == student.Id).Present;
-            //}
+            foreach (var attendance in lecture.Attendance)
+            {
+                bool? present = lvm.LectureItems
+                    .FirstOrDefault(item => attendance.Student.Id == item.StudentId)?.Present ?? null;
 
-            //_manager.LectureManager.Update(lecture);
+                if (present.HasValue)
+                {
+                    attendance.Present = present.Value;
+                }
+            }
 
-            //return RedirectToAction("Override", new { lectureId = lecture.Id });
+            // Needed to do something with the lecture class to get the details properly
+            ViewBag.ClassName = lecture.Class.Name;
 
-            // TODO: Delete this line
-            return View("Index", 0);
+
+            _manager.LectureManager.Update(lecture);
+
+            return RedirectToAction("Override", "Lecture", new { lectureId = lecture.Id });
         }
 
         #endregion
@@ -174,7 +180,7 @@ namespace UniWatch.Controllers
         {
             var lvm = GetLectureViewModel(lectureId);
 
-            if(lvm.Lecture == null)
+            if (lvm == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
             }
@@ -185,12 +191,12 @@ namespace UniWatch.Controllers
         [HttpPost]
         public ActionResult Delete(LectureViewModel lvm)
         {
-            if(lvm.Lecture == null)
+            if (lvm == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture given");
             }
 
-            var lecture = _manager.LectureManager.Delete(lvm.Lecture.Id);
+            var lecture = _manager.LectureManager.Delete(lvm.LectureId);
 
             return RedirectToAction("Index", new { classId = lecture.Class.Id });
         }
@@ -207,29 +213,50 @@ namespace UniWatch.Controllers
         private ReportViewModel GetReportViewModel(int classId)
         {
             ReportViewModel report = null;
-
-            // Get the class associated with the given class id
             var @class = _manager.ClassManager.GetById(classId);
 
             // If a class was found,
             // then add the other required information
             if(@class != null)
             {
-                report = new ReportViewModel
+                report = new ReportViewModel()
                 {
-                    Students = _manager.ClassManager.GetEnrolledStudents(classId).ToList(),
-                    Lectures = _manager.LectureManager.GetTeacherReport(classId)
-                        .OrderByDescending(lecture => lecture.RecordDate).ToList(),
-                    Attendance = new Dictionary<int, ICollection<StudentAttendance>>()
+                    ClassId = @class.Id,
+                    ClassName = @class.Name,
+                    Lectures = new List<Lecture>(@class.Lectures),
+                    Statuses = new List<AttendanceStatus>(@class.Enrollment.Count)
                 };
 
-                // Add each lecture attendance to the attendance dictionary
-                report.Lectures.ForEach(lecture => report.Attendance[lecture.Id] = lecture.Attendance);
+                foreach (var lecture in @class.Lectures)
+                {
+                    foreach (var attendance in lecture.Attendance)
+                    {
+                        if (report.Statuses.All(s => s.Student.Id != attendance.Student.Id))
+                        {
+                            report.Statuses.Add(new AttendanceStatus
+                            {
+                                Student = attendance.Student,
+                                Attendance = new Dictionary<int, bool>(@class.Lectures.Count)
+                            });
+                        }
+
+                        var status = report.Statuses.FirstOrDefault(s => s.Student.Id == attendance.Student.Id);
+                        if (status != null)
+                        {
+                            status.Attendance[lecture.Id] = attendance.Present;
+                        }
+                    }
+                }
             }
 
             return report;
         }
 
+        /// <summary>
+        /// Get the lecture view model for a lecture
+        /// </summary>
+        /// <param name="lectureId">The id for the lecture</param>
+        /// <returns>The lecture view model (or null if no lecture was found)</returns>
         private LectureViewModel GetLectureViewModel(int lectureId)
         {
             LectureViewModel lvm = null;
@@ -237,14 +264,27 @@ namespace UniWatch.Controllers
 
             if(lecture != null)
             {
-                lvm = new LectureViewModel
+                lvm = new LectureViewModel()
                 {
-                    Lecture = lecture,
-                    Students = new List<Student>(lecture.Attendance.Count)
+                    ClassId = lecture.Class.Id,
+                    LectureId = lecture.Id,
+                    LectureDate = lecture.RecordDate,
+                    LectureItems = new List<UpdateLectureItem>(lecture.Attendance.Count)
                 };
 
-                lecture.Attendance.ForEach(a => lvm.Students.Add(a.Student));
+                foreach (var a in lecture.Attendance)
+                {
+                    lvm.LectureItems.Add(
+                        new UpdateLectureItem
+                        {
+                            StudentId = a.Student.Id,
+                            StudentName = $"{a.Student.FirstName} {a.Student.LastName}",
+                            Present = a.Present
+                        }
+                    );
+                }
             }
+
             return lvm;
         }
 

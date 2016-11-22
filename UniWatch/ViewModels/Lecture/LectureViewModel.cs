@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using UniWatch.DataAccess;
-using UniWatch.Models;
 
 namespace UniWatch.ViewModels.Lecture
 {
     public class LectureViewModel
     {
-        public Models.Lecture Lecture { get; set; }
-        public List<Student> Students { get; set; }
+        public int ClassId { get; set; }
+        public int LectureId { get; set; }
+        public DateTime LectureDate { get; set; }
+        public List<UpdateLectureItem> LectureItems { get; set; }
+
+        public LectureViewModel()
+        {
+            LectureItems = new List<UpdateLectureItem>();
+        }
+    }
+
+    public class UpdateLectureItem
+    {
+        public int StudentId { get; set; }
+        public string StudentName { get; set; }
+        public bool Present { get; set; }
     }
 }

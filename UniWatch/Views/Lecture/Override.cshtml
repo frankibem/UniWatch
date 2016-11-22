@@ -4,14 +4,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Override Lecture - @ViewBag.LectureDate</h2>
+<h2>Override Lecture - @Model.LectureDate</h2>
 <hr />
 
 @using (Html.BeginForm("Override", "Lecture", FormMethod.Post, new { model = Model })) {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.Lecture.Id);
+    @Html.HiddenFor(model => model.LectureId);
 
-    if (!Model.Students.Any())
+    if (!Model.LectureItems.Any())
     {
         <h4>There is no attendance for this lecture</h4>
     }
@@ -25,27 +25,13 @@
             </tr>
             </thead>
             <tbody>
-            
-            @for(var i = 0; i < Model.Students.Count; i++)  
+            @for (var i = 0; i < Model.LectureItems.Count; i++)
             {
                 <tr>
-                    <td>@string.Format($"{Model.Students[i].FirstName} {Model.Students[i].LastName}")</td>
+                    <td>@Html.ValueFor(model => model.LectureItems[i].StudentName)</td>
                     <td>
-                        @* TODO: get this to pass the value of the attendance *@
-                        @for (var j = 0; j < Model.Lecture.Attendance.Count; j++)
-                        {
-                            if (Model.Lecture.Attendance.ElementAt(j).Student.Id == Model.Students[i].Id)
-                            {
-                                @Html.CheckBoxFor(model => model.Lecture.Attendance.ElementAt(j).Present)
-
-                                break;
-                            }
-
-                        }
-
-                        @*@Html.CheckBoxFor(model => model.Lecture.Attendance.Single(a => a.Student.Id == Model.Students[i].Id).Present)*@
-
-                        @Html.HiddenFor(model => model.Students[i].Id)
+                        @Html.CheckBoxFor(model => model.LectureItems[i].Present)
+                        @Html.HiddenFor(model => model.LectureItems[i].StudentId)
                     </td>
                 </tr>
             }
@@ -55,5 +41,7 @@
         <input type="submit" id="btnSubmit"/>
     }
 
-    @Html.ActionLink("Delete Lecture", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, null)
+
+    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.ClassId }, null)
+    @Html.ActionLink("Delete Lecture", "Delete", "Lecture", new { lectureId = Model.LectureId }, null)
 }
