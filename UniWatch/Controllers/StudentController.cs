@@ -49,12 +49,29 @@ namespace UniWatch.Controllers
         }
 
         [HttpGet]
-        public ActionResult Enroll(int classId, int studentId)
+        public ActionResult Enroll(int classId, String studentId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            var student = _dataAccess.UserManager.GetStudentById(studentId);
+            var EnrollViewModel = new EnrollViewModel()
+            {
+                //Get Class
+            };
+
+            var result = _dataAccess.UserManager.SearchStudents(studentId);
+            var enrolled = _dataAccess.ClassManager.EnrollStudents(classId);
+            var eSet = new HashSet<Student>(enrolled);
+            foreach (Student student in result)
+            {
+                EnrollViewModel.StudentsFound.Add(new StudentFound())
+                {
+                    Student = student,
+                    Enrolled = eSetContains(student);
+                }
+            }
+
+            //var student = _dataAccess.UserManager.GetStudentById(studentId);
             //var EnrollStudent = _classManager.EnrollStudent(classId, studentId);
-            return View(new EnrollViewModel() { Class = @class, Student = student });
+            return View(EnrollViewModel());
         }
 
         // GET: Get
