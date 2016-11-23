@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UniWatch.Models;
 
 namespace UniWatch.DataAccess
 {
     public interface ILectureManager : IDisposable
     {
-        /// <summary>
-        /// Create and save a new lecture
-        /// </summary>
-        /// <param name="lecture">The lecture to create</param>
-        /// <returns>The created lecture</returns>
-        Lecture Create(Lecture lecture);
-
         /// <summary>
         /// Returns the lecture with the given id
         /// </summary>
@@ -36,11 +30,12 @@ namespace UniWatch.DataAccess
         IEnumerable<StudentAttendance> GetStudentReport(int classId, int studentId);
 
         /// <summary>
-        /// Updates and saves the given lecture
+        /// Updates/Overrides the values in a lecture
         /// </summary>
-        /// <param name="lecture">The lecture to update</param>
+        /// <param name="lectureId">The id of the lecture to update</param>
+        /// <param name="updates">The list of updates to make</param>
         /// <returns>The updated lecture</returns>
-        Lecture Update(Lecture lecture);
+        Lecture Update(int lectureId, IEnumerable<UpdateLectureItem> updates);
 
         /// <summary>
         /// Deletes the matched record and all related information
@@ -48,5 +43,12 @@ namespace UniWatch.DataAccess
         /// <param name="lectureId">The id of the lecture to delete</param>
         /// <returns>The deleted lecture</returns>
         Lecture Delete(int lectureId);
+
+        /// <summary>
+        /// Record a new lecture for the given class using the given images
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        /// <param name="images">The images to detect students from</param>
+        Lecture RecordLecture(int classId, IEnumerable<Stream> images);
     }
 }
