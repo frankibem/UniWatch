@@ -74,22 +74,7 @@ namespace UniWatch.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lvm.Lecture.Id}");
             }
 
-            var updates = new List<UpdateLectureItem>(lecture.Attendance.Count);
-
-            updates.AddRange(from attendance in lecture.Attendance
-                             let present = lvm.LectureItems
-                                .FirstOrDefault(item => attendance.Student.Id == item.StudentId)?.Present ?? null
-                             where present.HasValue && attendance.Present != present.Value
-                             select new UpdateLectureItem
-                             {
-                                 StudentId = attendance.Student.Id,
-                                 LectureId = lecture.Id,
-                                 Present = present.Value
-                             }
-            );
-
-            _manager.LectureManager.Update(lecture.Id, updates);
-
+            _manager.LectureManager.Update(lecture.Id, lvm.LectureItems);
             return RedirectToAction("Override", "Lecture", new { lectureId = lecture.Id });
         }
 
