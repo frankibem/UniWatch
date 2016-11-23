@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UniWatch.Models;
 
 namespace UniWatch.ViewModels.Lecture
 {
@@ -9,17 +10,12 @@ namespace UniWatch.ViewModels.Lecture
         public int LectureId { get; set; }
         public DateTime LectureDate { get; set; }
         public List<UpdateLectureItem> LectureItems { get; set; }
+        public List<Student> Students { get; set; }
 
         public LectureViewModel()
         {
             LectureItems = new List<UpdateLectureItem>();
+            Students = new List<Student>();
         }
-    }
-
-    public class UpdateLectureItem
-    {
-        public int StudentId { get; set; }
-        public string StudentName { get; set; }
-        public bool Present { get; set; }
     }
 }

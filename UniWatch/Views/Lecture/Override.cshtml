@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Override Lecture - @Model.LectureDate</h2>
+<h2>Override Lecture - @Model.LectureDate.ToShortDateString()</h2>
 <hr />
 
 @using (Html.BeginForm("Override", "Lecture", FormMethod.Post, new { model = Model })) {
@@ -28,10 +28,17 @@
             @for (var i = 0; i < Model.LectureItems.Count; i++)
             {
                 <tr>
-                    <td>@Html.ValueFor(model => model.LectureItems[i].StudentName)</td>
+                    <td>
+                        @{
+                            var student = Model.Students.Find(s => s.Id == Model.LectureItems[i].StudentId);
+                            var name = student != null ? string.Format($"{student.FirstName} {student.LastName}") : string.Empty;
+                        }
+                        @Html.ValueFor(model => name)
+                    </td>
                     <td>
                         @Html.CheckBoxFor(model => model.LectureItems[i].Present)
                         @Html.HiddenFor(model => model.LectureItems[i].StudentId)
+                        @Html.HiddenFor(model => model.LectureItems[i].LectureId)
                     </td>
                 </tr>
             }

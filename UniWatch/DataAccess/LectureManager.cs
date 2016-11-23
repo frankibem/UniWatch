@@ -95,7 +95,7 @@ namespace UniWatch.DataAccess
             foreach(var attendance in lecture.Attendance)
                 attendanceMap.Add(attendance.Student.Id, attendance);
 
-            foreach(var item in updates)
+            foreach (var item in updates)
             {
                 StudentAttendance attendance;
                 if(attendanceMap.TryGetValue(item.StudentId, out attendance))
@@ -104,7 +104,8 @@ namespace UniWatch.DataAccess
                     {
                         // Only update if changed
                         attendance.Present = item.Present;
-                        _db.Entry(attendance).State = EntityState.Modified;
+                        _db.Attendance.Attach(attendance);
+                        _db.Entry(attendance).Property(a => a.Present).IsModified = true;
                     }
                 }
 
@@ -112,9 +113,6 @@ namespace UniWatch.DataAccess
                 // at the time the lecture was recorded.
             }
 
-
-            _db.Lectures.Attach(lecture);
-            _db.Entry(lecture).State = EntityState.Modified;
             _db.SaveChanges();
 
             return lecture;

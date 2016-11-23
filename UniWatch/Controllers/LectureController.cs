@@ -9,6 +9,7 @@ using Microsoft.Ajax.Utilities;
 using UniWatch.DataAccess;
 using UniWatch.Models;
 using UniWatch.ViewModels.Lecture;
+using UpdateLectureItem = UniWatch.Models.UpdateLectureItem;
 
 namespace UniWatch.Controllers
 {
@@ -101,22 +102,21 @@ namespace UniWatch.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lvm.LectureId}");
             }
 
-            foreach (var attendance in lecture.Attendance)
-            {
-                bool? present = lvm.LectureItems
-                    .FirstOrDefault(item => attendance.Student.Id == item.StudentId)?.Present ?? null;
+            var updates = new List<UpdateLectureItem>(lecture.Attendance.Count);
 
-                if (present.HasValue)
-                {
-                    attendance.Present = present.Value;
-                }
-            }
+            updates.AddRange(from attendance in lecture.Attendance
+                             let present = lvm.LectureItems
+                                .FirstOrDefault(item => attendance.Student.Id == item.StudentId)?.Present ?? null
+                             where present.HasValue && attendance.Present != present.Value
+                             select new UpdateLectureItem
+                             {
+                                StudentId = attendance.Student.Id,
+                                LectureId = lecture.Id,
+                                Present = present.Value
+                             }
+            );
 
-            // Needed to do something with the lecture class to get the details properly
-            ViewBag.ClassName = lecture.Class.Name;
-
-
-            _manager.LectureManager.Update(lecture);
+            _manager.LectureManager.Update(lecture.Id, updates);
 
             return RedirectToAction("Override", "Lecture", new { lectureId = lecture.Id });
         }
@@ -269,7 +269,8 @@ namespace UniWatch.Controllers
                     ClassId = lecture.Class.Id,
                     LectureId = lecture.Id,
                     LectureDate = lecture.RecordDate,
-                    LectureItems = new List<UpdateLectureItem>(lecture.Attendance.Count)
+                    LectureItems = new List<UpdateLectureItem>(lecture.Attendance.Count),
+                    Students = new List<Student>(lecture.Attendance.Count)
                 };
 
                 foreach (var a in lecture.Attendance)
@@ -278,10 +279,12 @@ namespace UniWatch.Controllers
                         new UpdateLectureItem
                         {
                             StudentId = a.Student.Id,
-                            StudentName = $"{a.Student.FirstName} {a.Student.LastName}",
+                            LectureId = lecture.Id,
                             Present = a.Present
                         }
                     );
+
+                    lvm.Students.Add(a.Student);
                 }
             }
 
