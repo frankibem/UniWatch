@@ -1,4 +1,4 @@
-﻿@model UniWatch.ViewModels.Lecture.ReportViewModel
+﻿@model UniWatch.ViewModels.TeacherReportViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,62 +8,57 @@
 <hr />
 
 @{
-    @Html.ActionLink("New Lecture", "Create", "Lecture", new {classId = Request.QueryString["classId"]}, null)
+    <p>
+        @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
+    </p>
 
-    if (!Model.Lectures.Any())
+    if(!Model.Lectures.Any())
     {
         <h4>There are no lectures for this class</h4>
     }
     else
     {
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Student</th>
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
 
-                @foreach (var lecture in Model.Lectures)
+                        @foreach(var lecture in Model.Lectures)
+                        {
+                            <th class="text-center">
+                                @Html.ActionLink(lecture.RecordDate.ToShortDateString(), "Override", "Lecture", new { lectureId = lecture.Id }, null)
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var status in Model.Statuses)
                 {
-                    <th class="text-center">
-                        @Html.ActionLink(
-                            lecture.RecordDate.ToShortDateString(),
-                            "Override",
-                            "Lecture",
-                            new
-                            {
-                                lectureId = lecture.Id
-                            },
-                            null
-                            )
-                    </th>
-                }
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var status in Model.Statuses)
-            {
-                <tr>
-                    <td>@string.Format($"{status.Student.FirstName} {status.Student.LastName}")</td>
+                        <tr>
+                            <td>@string.Format($"{status.Student.FirstName} {status.Student.LastName}")</td>
 
-                    @foreach (var lecture in Model.Lectures)
-                    {
-                        <td class="text-center">
-                            @if (!status.Attendance.ContainsKey(lecture.Id))
+                            @foreach(var lecture in Model.Lectures)
                             {
-                                <span class="glyphicon glyphicon-minus" style="color: cornflowerblue;"></span>
+                                <td class="text-center">
+                                    @if(!status.Attendance.ContainsKey(lecture.Id))
+                                    {
+                                        <span class="glyphicon glyphicon-minus" style="color: cornflowerblue;"></span>
+                                    }
+                                    else if(status.Attendance[lecture.Id])
+                                    {
+                                        <span class="glyphicon glyphicon-ok" style="color: green;"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                    }
+                                </td>
                             }
-                            else if (status.Attendance[lecture.Id])
-                            {
-                                <span class="glyphicon glyphicon-ok" style="color: green;"></span>
-                            }
-                            else
-                            {
-                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                            }
-                        </td>
+                        </tr>
                     }
-                </tr>
-            }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     }
 }

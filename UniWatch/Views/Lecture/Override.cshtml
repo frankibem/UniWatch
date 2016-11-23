@@ -1,54 +1,54 @@
-﻿@model UniWatch.ViewModels.Lecture.LectureViewModel
+﻿@model UniWatch.ViewModels.UpdateLectureViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Override Lecture - @Model.LectureDate.ToShortDateString()</h2>
+<h2>@Model.Class.Name - @Model.Lecture.RecordDate.ToShortDateString()</h2>
 <hr />
 
-@using (Html.BeginForm("Override", "Lecture", FormMethod.Post, new { model = Model })) {
+@using(Html.BeginForm("Override", "Lecture", FormMethod.Post))
+{
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.LectureId);
+    @Html.HiddenFor(model => model.Lecture.Id);
 
-    if (!Model.LectureItems.Any())
+    if(!Model.LectureItems.Any())
     {
         <h4>There is no attendance for this lecture</h4>
     }
     else
     {
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Student</th>
-                <th class="text-center">Attendance</th>
-            </tr>
-            </thead>
-            <tbody>
-            @for (var i = 0; i < Model.LectureItems.Count; i++)
-            {
-                <tr>
-                    <td>
-                        @{
-                            var student = Model.Students.Find(s => s.Id == Model.LectureItems[i].StudentId);
-                            var name = student != null ? string.Format($"{student.FirstName} {student.LastName}") : string.Empty;
-                        }
-                        @Html.ValueFor(model => name)
-                    </td>
-                    <td>
-                        @Html.CheckBoxFor(model => model.LectureItems[i].Present)
-                        @Html.HiddenFor(model => model.LectureItems[i].StudentId)
-                        @Html.HiddenFor(model => model.LectureItems[i].LectureId)
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+        <input type="submit" value="Update" class="btn btn-success" />
+        @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
+        <p />
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Present</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(int i = 0; i < Model.LectureItems.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.LectureItems[i].StudentName</td>
+                            <td>
+                                @Html.HiddenFor(model => model.LectureItems[i].LectureId)
+                                @Html.HiddenFor(model => model.LectureItems[i].StudentId)
+                                @Html.CheckBoxFor(model => model.LectureItems[i].Present)
 
-        <input type="submit" id="btnSubmit"/>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+        <input type="submit" value="Update" class="btn btn-success" />
+        @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
     }
-
-
-    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.ClassId }, null)
-    @Html.ActionLink("Delete Lecture", "Delete", "Lecture", new { lectureId = Model.LectureId }, null)
 }

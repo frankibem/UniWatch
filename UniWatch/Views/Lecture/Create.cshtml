@@ -1,13 +1,14 @@
-﻿@model UniWatch.Models.Lecture
+﻿@model UniWatch.Models.Class
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Create</h2>
+<h3>@Model.Name - Record a new lecture</h3>
 
-@using (Html.BeginForm("Create", "Lecture", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using(Html.BeginForm("Create", "Lecture", new { classId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <input type="file" name="file" />
-    <input type="submit" name="Submit" id="Submit" value="Upload" />
-    @Html.HiddenFor(model => model.Class.Id)
+    @Html.AntiForgeryToken()
+    <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" />
+    <input type="submit" value="Upload" class="btn btn-default" />
+    <p class="text-danger">@ViewBag.ErrorMessage</p>
 }

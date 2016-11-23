@@ -84,6 +84,12 @@ namespace UniWatch.Models
         public int StudentId { get; set; }
 
         /// <summary>
+        /// The student's name
+        /// </summary>
+        /// <remarks>Not required</remarks>
+        public string StudentName { get; set; }
+
+        /// <summary>
         /// True if the student was present and false otherwise
         /// </summary>
         public bool Present { get; set; }
