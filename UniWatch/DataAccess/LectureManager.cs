@@ -130,7 +130,10 @@ namespace UniWatch.DataAccess
             if(existing == null)
                 throw new InvalidOperationException("Error deleting lecture.");
 
-            return _db.Lectures.Remove(existing);
+            var lecture = _db.Lectures.Remove(existing);
+            _db.SaveChanges();
+
+            return lecture;
 
             // TODO: Delete all other lecture related information (Images (and blobs), Attendance)
         }

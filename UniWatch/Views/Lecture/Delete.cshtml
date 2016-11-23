@@ -1,4 +1,4 @@
-﻿
+﻿@model UniWatch.ViewModels.Lecture.LectureViewModel
 @{
     ViewBag.Title = "Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,3 +6,11 @@
 
 <h2>Delete</h2>
 
+@using (Html.BeginForm("Delete", "Lecture", new { lectureId = Model.LectureId, classId = Model.ClassId }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-actions no-color">
+        <input type="submit" value="Confirm" class="btn btn-default" /> |
+        @Html.ActionLink("Cancel", "Override", "Lecture", new { lectureId = Model.LectureId }, null)
+    </div>
+}

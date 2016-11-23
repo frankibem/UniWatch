@@ -189,16 +189,17 @@ namespace UniWatch.Controllers
         }
 
         [HttpPost]
-        public ActionResult Delete(LectureViewModel lvm)
+        [ActionName("Delete")]
+        public ActionResult DeleteConfirm(int lectureId, int classId)
         {
-            if (lvm == null)
+            var lecture = _manager.LectureManager.Delete(lectureId);
+
+            if (lecture == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture given");
             }
 
-            var lecture = _manager.LectureManager.Delete(lvm.LectureId);
-
-            return RedirectToAction("Index", new { classId = lecture.Class.Id });
+            return RedirectToAction("Index", new { classId = classId });
         }
 
         #endregion
