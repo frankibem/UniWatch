@@ -78,6 +78,11 @@ namespace UniWatch.Controllers
             return RedirectToAction("Override", "Lecture", new { lectureId = lecture.Id });
         }
 
+        /// <summary>
+        /// Display the
+        /// </summary>
+        /// <param name="classId"></param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Create(int classId)
         {
@@ -91,6 +96,11 @@ namespace UniWatch.Controllers
             return View(@class);
         }
 
+        /// <summary>
+        /// Create a new lecture and upload the lecture attendance images
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        /// <param name="files">The images to upload</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(int classId, IEnumerable<HttpPostedFileBase> files)
@@ -101,7 +111,7 @@ namespace UniWatch.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
 
-            if(files.Count() == 0)
+            if(!files.Any())
             {
                 ViewBag.ErrorMessage = "No file selected";
                 return View(@class);
@@ -139,6 +149,11 @@ namespace UniWatch.Controllers
             return RedirectToAction("Index", "Lecture", new { classId = @class.Id });
         }
 
+        /// <summary>
+        /// Diplay some of the lecture information so the user
+        /// knows which lecture they are about to delete
+        /// </summary>
+        /// <param name="lectureId">The id of the lecture to potentially delete</param>
         [HttpGet]
         public ActionResult Delete(int lectureId)
         {
@@ -152,8 +167,14 @@ namespace UniWatch.Controllers
             return View(lecture);
         }
 
+        /// <summary>
+        /// Confirm the deletion of the lecture
+        /// </summary>
+        /// <param name="lectureId">The id of the lecture to delete</param>
+        /// <param name="classId">The id of the class the deleted lecture was associated with</param>
         [HttpPost]
         [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirm(int lectureId, int classId)
         {
             var lecture = _manager.LectureManager.Delete(lectureId);
@@ -182,7 +203,7 @@ namespace UniWatch.Controllers
                 {
                     ClassId = @class.Id,
                     ClassName = @class.Name,
-                    Lectures = new List<Lecture>(@class.Lectures),
+                    Lectures = new List<Lecture>(@class.Lectures.OrderByDescending(lecture => lecture.RecordDate)),
                     Statuses = new List<AttendanceStatus>(@class.Enrollment.Count)
                 };
 
@@ -208,7 +229,7 @@ namespace UniWatch.Controllers
                     }
                 }
 
-                // Order by first name
+                // Order statuses by first name
                 report.Statuses = report.Statuses.OrderBy(s => s.Student.FirstName).ToList();
             }
 
