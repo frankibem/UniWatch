@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using UniWatch.DataAccess;
@@ -10,67 +11,102 @@ namespace UniWatch.Controllers
 {
     public class ClassController : Controller
     {
-        private IClassManager _classManager;
-        private IStudentManager _studentManager;
-       
+        private IDataAccess _dataAccess;
 
         public ClassController()
         {
-            _classManager = new ClassManager();
-            _studentManager = new StudentManager();
-          //  var classes = _classManager.GetClassesForTeacher(teacherId);
+            _dataAccess = new DataAccess.DataAccess();
+        }
+
+        public ClassController(IDataAccess dataAccess)
+        {
+            _dataAccess = dataAccess;
         }
 
         //GET: Index
+        /// <summary>
+        /// Displays all classes taught by the teacher
+        /// </summary>
+        /// <param name="teacherId">Id of the teacher</param>
         public ActionResult Index(int teacherId)
         {
             ViewBag.TeacherId = teacherId;
-            return View(_classManager.GetClassesForTeacher(teacherId));
+            return View(_dataAccess.ClassManager.GetClassesForTeacher(teacherId));
         }
 
 
         // GET: Create
+        /// <summary>
+        /// Sends user to the create class page
+        /// </summary>
+        /// <param name="teacherId">Id of the teacher</param>
         public ActionResult Create(int teacherId)
         {
-            var teacher=_studentManager.GetTeacher(teacherId);
-            return View(new Class() { Teacher= teacher});
+            var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
+            return View(new Class() { Teacher = teacher });
         }
 
         //POST: Create
+        /// <summary>
+        /// Create class for the teacher
+        /// </summary>
+        /// <param name="class">Model containing information to create the class</param>
+        /// <param name="teacherId">Id of the teacher</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Name,Number,Section,Semester,Year,Teacher")] Class @class)
+        public ActionResult Create([Bind(Include = "Name,Number,Section,Semester,Year")] Class @class, int teacherId)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    _classManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, @class.Teacher.Id);
-                
-            //    return RedirectToAction("Index");
-            //}
-            _classManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year,@class.Teacher.Id);
-            return RedirectToAction("Index", new { teacherId = @class.Teacher.Id});
-            //return View(@class);
+            if (!ModelState.IsValid)
+            {
+                return View(@class);
+            }
+
+            var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacherId);
+            return RedirectToAction("Index", new { teacherId = created.Teacher.Id });
         }
 
         //GET: Delete
+        /// <summary>
+        /// Sends user to the delete class page
+        /// </summary>
+        /// <param name="classId">Id of the class</param>
         public ActionResult Delete(int classId)
         {
-            var @class = _classManager.GetById(classId);
+            var @class = _dataAccess.ClassManager.GetById(classId);
+            if (@class == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+            }
+
             return View(@class);
         }
 
         //POST: Delete
-        [HttpPost, ActionName("Delete")]
+        /// <summary>
+        /// Deletes the class
+        /// </summary>
+        /// <param name="classId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int classId)
         {
-            var teacherId =_classManager.DeleteClass(classId);
+            var @class = _dataAccess.ClassManager.GetById(classId);
+            var teacherId = @class.Teacher.Id;
+
+            if (@class == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+            }
+
+            _dataAccess.ClassManager.DeleteClass(classId);
             return RedirectToAction("Index", new { teacherId = teacherId });
         }
 
         protected override void Dispose(bool dispose)
         {
-            base.Dispose(dispose);
+            _dataAccess.Dispose();
         }
     }
 }

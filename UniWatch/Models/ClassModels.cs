@@ -19,6 +19,7 @@ namespace UniWatch.Models
         /// <summary>
         /// The course number
         /// </summary>
+        [Display(Name = "Course Number")]
         public int Number { get; set; }
 
         /// <summary>
