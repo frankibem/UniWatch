@@ -57,14 +57,14 @@ namespace UniWatch.Controllers
                 //Get Class
             };
 
-            var result = _dataAccess.UserManager.SearchStudents(studentId);
-            var enrolled = _dataAccess.ClassManager.EnrollStudents(classId);
+            var result = _dataAccess.UserManager.SearchStudent(studentId);
+            var enrolled = _dataAccess.ClassManager.EnrollStudent(classId, studentId);
             var eSet = new HashSet<Student>(enrolled);
             foreach (Student student in result)
             {
                 EnrollViewModel.StudentsFound.Add(new StudentFound())
                 {
-                    Student = student,
+                    Student = student
                     Enrolled = eSetContains(student);
                 }
             }
