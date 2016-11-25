@@ -1,37 +1,43 @@
-﻿@model IEnumerable<UniWatch.Models.Student>
+﻿@model UniWatch.ViewModels.EnrollIndexViewModel
 
-@{
-    ViewBag.Title = "Index";
-}
-
-<h2>Index</h2>
+<h3>Students in @Model.Class.Name</h3>
+<hr />
 
 <p>
-    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = 1}, null)
+    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = Model.Class.Id }, new { @class = "btn btn-primary" })
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.FirstName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LastName)
-        </th>
-        <th></th>
-    </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.FirstName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LastName)
-        </td>
-        <td>
-            @Html.ActionLink("Delete", "UnEnroll", "Student", new { classId = 1, studentId = 4 }, null)
-        </td>
-    </tr>
+@if (!Model.EnrolledStudents.Any())
+{
+    <p>No students currently enrolled in this class.</p>
 }
+else {
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-inverse">
+                <tr>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
 
-</table>
+            <tbody>
+                @foreach (var student in Model.EnrolledStudents)
+                {
+                    <tr>
+                        <td>@student.FirstName</td>
+                        <td>@student.LastName</td>
+                        <td>
+                            @Html.ActionLink("UnEnroll", "UnEnroll", "Student", new { classId = Model.Class.Id, studentId = student.Id }, new { @class = "btn btn-danger" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

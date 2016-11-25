@@ -8,6 +8,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using UniWatch.Models;
+using UniWatch.Services;
 
 namespace UniWatch
 {
@@ -23,6 +24,9 @@ namespace UniWatch
 
             // Initialize Database
             Database.SetInitializer(new AppDbInitializer());
+
+            // Clear all Cognitive Service Data
+            // RecognitionService.ClearAll();
         }
     }
 }

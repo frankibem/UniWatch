@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Configuration;
@@ -45,10 +46,12 @@ namespace UniWatch.Models
             };
             CreateUsersAndAddToRole(teacherList, teacherRole);
 
-            var teachers = new List<Teacher>();
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Temple", "Witman", teacherList[0]));
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Daniel", "Payne", teacherList[1]));
-            teachers.Add(_dataAccess.UserManager.CreateTeacher("Elton", "Grice", teacherList[2]));
+            var teachers = new List<Teacher>
+            {
+                _dataAccess.UserManager.CreateTeacher("Temple", "Witman", teacherList[0]),
+                _dataAccess.UserManager.CreateTeacher("Daniel", "Payne", teacherList[1]),
+                _dataAccess.UserManager.CreateTeacher("Elton", "Grice", teacherList[2])
+            };
 
             // Create some students
             var studentList = new List<ApplicationUser>
@@ -60,26 +63,61 @@ namespace UniWatch.Models
             };
             CreateUsersAndAddToRole(studentList, studentRole);
 
-            var students = new List<Student>();
-            students.Add(_dataAccess.UserManager.CreateStudent("Joshua", "Hernandez", studentList[0]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Frank", "Ibem", studentList[1]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Claire", "Gray", studentList[2]));
-            students.Add(_dataAccess.UserManager.CreateStudent("Patrick", "Tone", studentList[3]));
+            var students = new List<Student>
+            {
+                _dataAccess.UserManager.CreateStudent("Joshua", "Hernandez", studentList[0]),
+                _dataAccess.UserManager.CreateStudent("Frank", "Ibem", studentList[1]),
+                _dataAccess.UserManager.CreateStudent("Claire", "Gray", studentList[2]),
+                _dataAccess.UserManager.CreateStudent("Patrick", "Tone", studentList[3])
+            };
 
             // Create some classes
-            _dataAccess.ClassManager.CreateClass("Data Structures", 2413, "001", Semester.Fall, 2016, teachers[0].Id);
-            _dataAccess.ClassManager.CreateClass("Senior Capstone", 4366, "001", Semester.Spring, 2016, teachers[1].Id);
-            _dataAccess.ClassManager.CreateClass("Theory of Automata", 3383, "001", Semester.Summer1, 2017, teachers[0].Id);
-            var classes = _context.Classes.ToList();
+            var classes = new List<Class>
+            {
+                new Class() { Name = "Data Structures", Number = 2413, Section = "001", Semester = Semester.Fall, Year = 2016, Teacher = teachers[0], TrainingStatus = TrainingStatus.UnTrained },
+                new Class() { Name = "Senior Capstone", Number = 4366, Section = "001", Semester = Semester.Spring, Year = 2016, Teacher = teachers[1], TrainingStatus = TrainingStatus.UnTrained },
+                new Class() { Name = "Theory of Automata", Number = 3383, Section = "001", Semester = Semester.Summer1, Year = 2016, Teacher = teachers[2], TrainingStatus = TrainingStatus.UnTrained }
+            };
+            _context.Classes.AddRange(classes);
+            _context.SaveChanges();
 
             // Enroll some students
-            _dataAccess.ClassManager.EnrollStudent(classes[0].Id, students[0].Id);
-            _dataAccess.ClassManager.EnrollStudent(classes[0].Id, students[1].Id);
-            _dataAccess.ClassManager.EnrollStudent(classes[1].Id, students[0].Id);
-            _dataAccess.ClassManager.EnrollStudent(classes[2].Id, students[0].Id);
-
+            var enrollments = new List<Enrollment>
+            {
+                new Enrollment() { Class = classes[0], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[0], Student = students[1], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[1], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[2], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() }
+            };
+            _context.Enrollments.AddRange(enrollments);
             _context.SaveChanges();
-            base.Seed(context);
+
+            // Hold some lectures
+            var lectures = new List<Lecture>
+            {
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-1) },
+                new Lecture() { Class = classes[1], RecordDate = DateTime.Today.AddDays(-2) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-9) }
+            };
+            _context.Lectures.AddRange(lectures);
+            _context.SaveChanges();
+
+            // Take some attendance
+            var attendance = new List<StudentAttendance>
+            {
+                new StudentAttendance() { Lecture = lectures[0], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[0], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[0], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[1], Present = true },
+                new StudentAttendance() { Lecture = lectures[1], Student = students[0], Present = false}
+            };
+            _context.Attendance.AddRange(attendance);
+            _context.SaveChanges();
+
+            base.Seed(_context);
         }
 
         /// <summary>

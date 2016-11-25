@@ -110,6 +110,7 @@ namespace UniWatch.DataAccess
         /// Returns a list of all students whose id matches the given id
         /// </summary>
         /// <param name="id">The search string</param>
+        /// <remarks>Returns an empty list if given a null or empty search string</remarks>
         public IEnumerable<Student> SearchStudent(string id)
         {
             if(string.IsNullOrEmpty(id))

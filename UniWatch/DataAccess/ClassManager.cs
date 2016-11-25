@@ -118,8 +118,7 @@ namespace UniWatch.DataAccess
         public Enrollment EnrollStudent(int classId, int studentId)
         {
             var existing = _db.Enrollments
-                .Where(e => e.Class.Id == classId && e.Student.Id == studentId)
-                .FirstOrDefault();
+                .FirstOrDefault(e => e.Class.Id == classId && e.Student.Id == studentId);
 
             var @class = _db.Classes.Find(classId);
             var student = _db.Students.Find(studentId);
@@ -137,12 +136,12 @@ namespace UniWatch.DataAccess
             _db.Enrollments.Add(enrollment);
 
             // Create the Person for this student
-            var faceClient = RecognitionService.GetFaceClient();
-            var result = faceClient.CreatePersonAsync(classId.ToString(), student.FirstName).Result;
+            //var faceClient = RecognitionService.GetFaceClient();
+            //var result = faceClient.CreatePersonAsync(classId.ToString(), student.FirstName).Result;
 
-            // Update training status for class
-            enrollment.PersonId = result.PersonId;
-            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
+            //// Update training status for class
+            //enrollment.PersonId = result.PersonId;
+            //enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
             _db.SaveChanges();
 
             return enrollment;
@@ -164,16 +163,16 @@ namespace UniWatch.DataAccess
                 throw new InvalidOperationException("Error unenrolling student");
 
             // Delete the Person object from the PersonGroup
-            var faceClient = RecognitionService.GetFaceClient();
-            faceClient.DeletePersonAsync(classId.ToString(), enrollment.PersonId);
+            //var faceClient = RecognitionService.GetFaceClient();
+            //faceClient.DeletePersonAsync(classId.ToString(), enrollment.PersonId);
 
             // Remove all attendance and enrollment information
             var attendance = _db.Attendance.Where(a => a.Student.Id == studentId);
             _db.Attendance.RemoveRange(attendance);
-            _db.Enrollments.Remove(enrollment);
+            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
 
             // Update training status for class
-            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
+            _db.Enrollments.Remove(enrollment);
             _db.SaveChanges();
 
             return enrollment;

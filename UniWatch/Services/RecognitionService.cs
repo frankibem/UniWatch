@@ -69,5 +69,19 @@ namespace UniWatch.Services
 
             return detectedStudents;
         }
+
+        /// <summary>
+        /// Clears all data stored in the service
+        /// </summary>
+        public static void ClearAll()
+        {
+            var faceClient = GetFaceClient();
+            var personGroups = faceClient.ListPersonGroupsAsync().Result;
+
+            foreach(var group in personGroups)
+            {
+                faceClient.DeletePersonGroupAsync(group.PersonGroupId);
+            }
+        }
     }
 }

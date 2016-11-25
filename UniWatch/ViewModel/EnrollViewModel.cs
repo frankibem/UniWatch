@@ -11,12 +11,13 @@ namespace UniWatch.ViewModels
     {
  
         public Class Class { get; set; }
-        public List<StudentFound> StudentsFound { get; set; }
+        public List<StudentFound> StudentsFound {get; set;}
 
-        //Default Constructor for EnrollViewModel
+        // Default Constructor for EnrollViewModel
         public EnrollViewModel()
         {
             StudentsFound = new List<StudentFound>();
+
         }
     }
 

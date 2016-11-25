@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Configuration;
+using Microsoft.Ajax.Utilities;
 using UniWatch.Models;
 using UniWatch.Services;
 
@@ -52,8 +53,16 @@ namespace UniWatch.DataAccess
         /// <returns>A list of all lectures for the class</returns>
         public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
-            return _db.Lectures.
-                Where(lecture => lecture.Class.Id == classId);
+            var lectures = _db.Lectures.Where(lecture => lecture.Class.Id == classId).ToList();
+            foreach(var lecture in lectures)
+            {
+                var attendance = _db.Attendance
+                    .Where(a => a.Lecture.Id == lecture.Id)
+                    .Include(a => a.Student);
+                lecture.Attendance = attendance.ToList();
+            }
+
+            return lectures;
         }
 
         /// <summary>
@@ -69,19 +78,41 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
-        /// Updates and saves the given lecture
+        /// Updates/Overrides the values in a lecture
         /// </summary>
-        /// <param name="lecture">The lecture to update</param>
+        /// <param name="lectureId">The id of the lecture to update</param>
+        /// <param name="updates">The list of updates to make</param>
         /// <returns>The updated lecture</returns>
-        public Lecture Update(Lecture lecture)
+        public Lecture Update(int lectureId, IEnumerable<UpdateLectureItem> updates)
         {
-            var existing = _db.Lectures.Find(lecture.Id);
+            var lecture = _db.Lectures.Find(lectureId);
 
             // Doesn't exist
-            if(existing == null)
-                throw new InvalidOperationException("Error updating lecture");
+            if(lecture == null)
+                throw new InvalidOperationException("Error updating lecture. Id not found.");
 
-            _db.Entry(lecture).State = EntityState.Modified;
+            var attendanceMap = new Dictionary<int, StudentAttendance>(lecture.Attendance.Count);
+            foreach(var attendance in lecture.Attendance)
+                attendanceMap.Add(attendance.Student.Id, attendance);
+
+            foreach (var item in updates)
+            {
+                StudentAttendance attendance;
+                if(attendanceMap.TryGetValue(item.StudentId, out attendance))
+                {
+                    if(attendance.Present != item.Present)
+                    {
+                        // Only update if changed
+                        attendance.Present = item.Present;
+                        _db.Attendance.Attach(attendance);
+                        _db.Entry(attendance).Property(a => a.Present).IsModified = true;
+                    }
+                }
+
+                // Assumption: we do not create new attendance objects for students who were not enrolled
+                // at the time the lecture was recorded.
+            }
+
             _db.SaveChanges();
 
             return lecture;
@@ -97,22 +128,14 @@ namespace UniWatch.DataAccess
             var existing = _db.Lectures.Find(lectureId);
 
             if(existing == null)
-                throw new InvalidOperationException("Error deleting class.");
+                throw new InvalidOperationException("Error deleting lecture.");
 
-            return _db.Lectures.Remove(existing);
+            var lecture = _db.Lectures.Remove(existing);
+            _db.SaveChanges();
+
+            return lecture;
 
             // TODO: Delete all other lecture related information (Images (and blobs), Attendance)
-        }
-
-        /// <summary>
-        /// Create and save a new lecture
-        /// </summary>
-        /// <param name="lecture">The lecture to create</param>
-        /// <returns>The created lecture</returns>
-        public Lecture Create(Lecture lecture)
-        {
-            // TODO: Implemente Create Lecture
-            return null;
         }
 
         /// <summary>

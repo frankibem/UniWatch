@@ -1,21 +1,16 @@
 ﻿@model UniWatch.ViewModels.UnEnrollViewModel
 
-@{
-    ViewBag.Title = "UnEnroll";
-}
+<h3>Unenroll @string.Format("{0} {1}", Model.Student.FirstName, Model.Student.LastName) from @Model.Class.Name ?</h3>
 
-<h2>Confirmation Message</h2>
+<p>Removing this student from this class will delete all associated data and cannot be undone. Proceed?</p>
 
-<h3>Are you sure you want to remove 
-    @string.Format("\"{0} {1}\"", Model.Student.FirstName, Model.Student.LastName) 
-    from @string.Format("{0}", Model.Class.Name)?</h3>
 <div>
     @using (Html.BeginForm("UnEnroll", "Student", new { classId = Model.Class.Id, studentId = Model.Student.Id }, FormMethod.Post)) {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Confirm" class="btn btn-default" /> |
             @Html.ActionLink("Cancel", "Index", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+            <input type="submit" value="Confirm" class="btn btn-danger" />
         </div>
     }
 </div>
