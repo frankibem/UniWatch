@@ -168,15 +168,19 @@ namespace UniWatch.DataAccess
         /// Deletes a class with the given id and all other related information
         /// </summary>
         /// <param name="classId">Id of the class to delete</param>
-        public Class DeleteClass(int classId)
+        public int DeleteClass(int classId)
         {
             var existing = _db.Classes.Find(classId);
+            var teacherId = existing.Teacher.Id;
 
             if(existing == null)
                 throw new InvalidOperationException("Error deleting class.");
 
-            return _db.Classes.Remove(existing);
+            _db.Classes.Remove(existing);
+            _db.SaveChanges();
 
+            return teacherId;
+        
             // TODO: Delete all other class related data (Lectures, Enrollments)
         }
 

@@ -11,5 +11,7 @@ namespace UniWatch.DataAccess
         /// <param name="studentId">The id of the student to search for</param>
         /// <returns>The student with the given id. Returns null if no such student exists</returns>
         Student GetById(int studentId);
+
+        Teacher GetTeacher(int teacherId);
     }
 }

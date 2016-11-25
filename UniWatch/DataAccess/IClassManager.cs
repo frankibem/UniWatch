@@ -66,6 +66,6 @@ namespace UniWatch.DataAccess
         /// Deletes a class with the given id and all other related information
         /// </summary>
         /// <param name="classId">Id of the class to delete</param>
-        Class DeleteClass(int classId);
+        int DeleteClass(int classId);
     }
 }

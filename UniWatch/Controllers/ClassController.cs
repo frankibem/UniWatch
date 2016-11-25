@@ -11,23 +11,29 @@ namespace UniWatch.Controllers
     public class ClassController : Controller
     {
         private IClassManager _classManager;
+        private IStudentManager _studentManager;
+       
 
         public ClassController()
         {
             _classManager = new ClassManager();
+            _studentManager = new StudentManager();
+          //  var classes = _classManager.GetClassesForTeacher(teacherId);
         }
 
         //GET: Index
-        public ActionResult Index()
+        public ActionResult Index(int teacherId)
         {
-            return View();
+            ViewBag.TeacherId = teacherId;
+            return View(_classManager.GetClassesForTeacher(teacherId));
         }
 
 
         // GET: Create
-        public ActionResult Create()
+        public ActionResult Create(int teacherId)
         {
-            return View();
+            var teacher=_studentManager.GetTeacher(teacherId);
+            return View(new Class() { Teacher= teacher});
         }
 
         //POST: Create
@@ -35,14 +41,22 @@ namespace UniWatch.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Name,Number,Section,Semester,Year,Teacher")] Class @class)
         {
+            //if (ModelState.IsValid)
+            //{
+            //    _classManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, @class.Teacher.Id);
+                
+            //    return RedirectToAction("Index");
+            //}
             _classManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year,@class.Teacher.Id);
-            return View(@class);
+            return RedirectToAction("Index", new { teacherId = @class.Teacher.Id});
+            //return View(@class);
         }
 
         //GET: Delete
-        public ActionResult Delete()
+        public ActionResult Delete(int classId)
         {
-            return View();
+            var @class = _classManager.GetById(classId);
+            return View(@class);
         }
 
         //POST: Delete
@@ -50,10 +64,13 @@ namespace UniWatch.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int classId)
         {
-            _classManager.DeleteClass(classId);
-            return RedirectToAction("Index");
+            var teacherId =_classManager.DeleteClass(classId);
+            return RedirectToAction("Index", new { teacherId = teacherId });
         }
 
-
+        protected override void Dispose(bool dispose)
+        {
+            base.Dispose(dispose);
+        }
     }
 }

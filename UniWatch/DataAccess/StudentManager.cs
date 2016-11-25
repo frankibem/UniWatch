@@ -35,6 +35,11 @@ namespace UniWatch.DataAccess
             return _db.Students.Find(studentId);
         }
 
+        public Teacher GetTeacher(int teacherId)
+        {
+            return _db.Teachers.Find(teacherId);
+        }
+
         public void Dispose()
         {
             Dispose(true);
