@@ -13,7 +13,7 @@ namespace UniWatch.Controllers
     {
         private IDataAccess _dataAccess;
 
-        public ClassController()
+        public ClassController():this(new DataAccess.DataAccess())
         {
             _dataAccess = new DataAccess.DataAccess();
         }
@@ -30,6 +30,11 @@ namespace UniWatch.Controllers
         /// <param name="teacherId">Id of the teacher</param>
         public ActionResult Index(int teacherId)
         {
+            var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
+                if (teacher==null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
             ViewBag.TeacherId = teacherId;
             return View(_dataAccess.ClassManager.GetClassesForTeacher(teacherId));
         }
@@ -43,6 +48,11 @@ namespace UniWatch.Controllers
         public ActionResult Create(int teacherId)
         {
             var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
+            if (teacher == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+           // var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
             return View(new Class() { Teacher = teacher });
         }
 
@@ -60,9 +70,16 @@ namespace UniWatch.Controllers
             {
                 return View(@class);
             }
-
-            var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacherId);
-            return RedirectToAction("Index", new { teacherId = created.Teacher.Id });
+            try
+            {
+                var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacherId);
+                return RedirectToAction("Index", new { teacherId = created.Teacher.Id });
+            }
+            catch (InvalidOperationException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.Conflict);
+            }
+          
         }
 
         //GET: Delete
