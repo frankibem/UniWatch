@@ -33,6 +33,12 @@ namespace UniWatch.Models
         /// The list of attendance information for this lecture
         /// </summary>
         public virtual ICollection<StudentAttendance> Attendance { get; set; }
+
+        public Lecture()
+        {
+            Images = new List<UploadedImage>();
+            Attendance = new List<StudentAttendance>();
+        }
     }
 
     /// <summary>
@@ -60,5 +66,32 @@ namespace UniWatch.Models
         /// </summary>
         [Required]
         public virtual Lecture Lecture { get; set; }
+    }
+
+    /// <summary>
+    /// Model for updating a Lecture
+    /// </summary>
+    public class UpdateLectureItem
+    {
+        /// <summary>
+        /// The Id of the lecture to update
+        /// </summary>
+        public int LectureId { get; set; }
+
+        /// <summary>
+        /// The Id of the student to update attendance for
+        /// </summary>
+        public int StudentId { get; set; }
+
+        /// <summary>
+        /// The student's name
+        /// </summary>
+        /// <remarks>Not required</remarks>
+        public string StudentName { get; set; }
+
+        /// <summary>
+        /// True if the student was present and false otherwise
+        /// </summary>
+        public bool Present { get; set; }
     }
 }

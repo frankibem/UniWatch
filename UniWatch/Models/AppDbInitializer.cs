@@ -2,21 +2,19 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Configuration;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using RestSharp.Extensions;
 using UniWatch.DataAccess;
 
 namespace UniWatch.Models
 {
-    public class AppDbInitializer : DropCreateDatabaseAlways<AppDbContext>
+    public class AppDbInitializer : DropCreateDatabaseIfModelChanges<AppDbContext>
     {
         private AppDbContext _context;
         private ApplicationUserManager _userManager;
         private RoleManager<IdentityRole> _roleManager;
-        private ClassManager _classManager;
+        private IDataAccess _dataAccess;
         private string _pwd;
 
         protected override void Seed(AppDbContext context)
@@ -24,16 +22,16 @@ namespace UniWatch.Models
             _context = context;
             _userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(_context));
             _roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(_context));
-            _classManager = new ClassManager(_context);
+            _dataAccess = new DataAccess.DataAccess(context);
             _pwd = WebConfigurationManager.AppSettings["TestPassword"];
 
             // Create user roles if they do not exist
             const string teacherRole = "Teacher";
             const string studentRole = "Student";
-            var roles = new List<string> {"Admin", teacherRole, studentRole };
-            foreach (var role in roles)
+            var roles = new List<string> { "Admin", teacherRole, studentRole };
+            foreach(var role in roles)
             {
-                if (!_roleManager.RoleExists(role))
+                if(!_roleManager.RoleExists(role))
                 {
                     _roleManager.Create(new IdentityRole(role));
                 }
@@ -42,88 +40,101 @@ namespace UniWatch.Models
             // Create some teachers
             var teacherList = new List<ApplicationUser>
             {
-                new ApplicationUser() { UserName = "iteachallclasses", Email = "all@uniwatch.io", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "iteachnoclasses", Email = "no@uniwatch.io", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "iteach", Email = "teach@uniwatch.io", PhoneNumber = "5551231234" }
+                new ApplicationUser() { UserName = "Temple", Email = "witman@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "Daniel", Email = "payne@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "Elton", Email = "grice@uniwatch.com", PhoneNumber = "5551231234" }
             };
+            CreateUsersAndAddToRole(teacherList, teacherRole);
 
             var teachers = new List<Teacher>
             {
-                new Teacher() { FirstName = "All", LastName = "Classes", Identity = teacherList[0] },
-                new Teacher() { FirstName = "No", LastName = "Classes", Identity = teacherList[1] },
-                new Teacher() { FirstName = "Some", LastName = "Classes", Identity = teacherList[2] },
+                _dataAccess.UserManager.CreateTeacher("Temple", "Witman", teacherList[0]),
+                _dataAccess.UserManager.CreateTeacher("Daniel", "Payne", teacherList[1]),
+                _dataAccess.UserManager.CreateTeacher("Elton", "Grice", teacherList[2])
             };
-
-            CreateUsersAndAddToRole<Teacher>(teachers, teacherRole);
 
             // Create some students
             var studentList = new List<ApplicationUser>
             {
-                new ApplicationUser() { UserName = "josh", Email = "joshua@uniwatch.io", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "frank", Email = "frank@uniwatch.io", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "claire", Email = "claire@uniwatch.io", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "patrick", Email = "patrick@uniwatch.io", PhoneNumber = "5551231234" }
+                new ApplicationUser() { UserName = "Josh", Email = "jos@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "Frank", Email = "frank@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "Claire", Email = "claire@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "Patrick", Email = "patrick@uniwatch.com", PhoneNumber = "5551231234" }
             };
+            CreateUsersAndAddToRole(studentList, studentRole);
 
             var students = new List<Student>
             {
-                new Student() { FirstName = "Josh", LastName = "Hernandez", Identity = studentList[0] },
-                new Student() { FirstName = "Frank", LastName = "Ibem", Identity = studentList[1] },
-                new Student() { FirstName = "Claire", LastName = "Gray", Identity = studentList[2] },
-                new Student() { FirstName = "Patrick", LastName = "Tone", Identity = studentList[3] },
-
+                _dataAccess.UserManager.CreateStudent("Joshua", "Hernandez", studentList[0]),
+                _dataAccess.UserManager.CreateStudent("Frank", "Ibem", studentList[1]),
+                _dataAccess.UserManager.CreateStudent("Claire", "Gray", studentList[2]),
+                _dataAccess.UserManager.CreateStudent("Patrick", "Tone", studentList[3])
             };
-
-            CreateUsersAndAddToRole<Student>(students, studentRole);
 
             // Create some classes
-            _classManager.CreateClass("Class 0", 0, "All", Semester.Fall, 2016, teachers[0].Id);
-            _classManager.CreateClass("Class 1", 0, "Some", Semester.Spring, 2016, teachers[1].Id);
-            _classManager.CreateClass("Class 2", 0, "Another Sect", Semester.Summer1, 2017, teachers[0].Id);
-
-            var classes = _context.Classes.ToList();
-
-            // Enroll some students in some classes
-            _classManager.EnrollStudent(classes[0].Id, students[0].Id);
-            _classManager.EnrollStudent(classes[0].Id, students[1].Id);
-            _classManager.EnrollStudent(classes[1].Id, students[0].Id);
-            _classManager.EnrollStudent(classes[2].Id, students[0].Id);
-
-            // Create some facial profiles for the students
-            var facialProfiles = new List<FacialProfile>
+            var classes = new List<Class>
             {
-                new FacialProfile() { Student = students[0], RecognizerTrained = false },
-                new FacialProfile() { Student = students[1], RecognizerTrained = false },
-                new FacialProfile() { Student = students[2], RecognizerTrained = false },
-                new FacialProfile() { Student = students[3], RecognizerTrained = false }
+                new Class() { Name = "Data Structures", Number = 2413, Section = "001", Semester = Semester.Fall, Year = 2016, Teacher = teachers[0], TrainingStatus = TrainingStatus.UnTrained },
+                new Class() { Name = "Senior Capstone", Number = 4366, Section = "001", Semester = Semester.Spring, Year = 2016, Teacher = teachers[1], TrainingStatus = TrainingStatus.UnTrained },
+                new Class() { Name = "Theory of Automata", Number = 3383, Section = "001", Semester = Semester.Summer1, Year = 2016, Teacher = teachers[2], TrainingStatus = TrainingStatus.UnTrained }
             };
-
-            _context.FacialProfiles.AddRange(facialProfiles);
+            _context.Classes.AddRange(classes);
             _context.SaveChanges();
 
-            // Initiailze database here
-            base.Seed(context);
+            // Enroll some students
+            var enrollments = new List<Enrollment>
+            {
+                new Enrollment() { Class = classes[0], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[0], Student = students[1], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[1], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() },
+                new Enrollment() { Class = classes[2], Student = students[0], EnrollDate = DateTime.Now, PersonId = Guid.NewGuid() }
+            };
+            _context.Enrollments.AddRange(enrollments);
+            _context.SaveChanges();
+
+            // Hold some lectures
+            var lectures = new List<Lecture>
+            {
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-1) },
+                new Lecture() { Class = classes[1], RecordDate = DateTime.Today.AddDays(-2) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
+                new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-9) }
+            };
+            _context.Lectures.AddRange(lectures);
+            _context.SaveChanges();
+
+            // Take some attendance
+            var attendance = new List<StudentAttendance>
+            {
+                new StudentAttendance() { Lecture = lectures[0], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[0], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[0], Present = true },
+                new StudentAttendance() { Lecture = lectures[2], Student = students[1], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[0], Present = false },
+                new StudentAttendance() { Lecture = lectures[3], Student = students[1], Present = true },
+                new StudentAttendance() { Lecture = lectures[1], Student = students[0], Present = false}
+            };
+            _context.Attendance.AddRange(attendance);
+            _context.SaveChanges();
+
+            base.Seed(_context);
         }
 
         /// <summary>
-        /// A generic method for adding objects to the database
+        /// Creates the given users and assigns them the given role
         /// </summary>
-        /// <typeparam name="T">
-        /// The type of class to add to the database
-        /// </typeparam>
         /// <param name="users">
-        /// The users to add to the database
+        /// The users to create
         /// </param>
         /// <param name="role">
-        /// The user's role
+        /// The role to assign
         /// </param>
-        private void CreateUsersAndAddToRole<T>(IEnumerable<User> users, string role) where T : class
+        private void CreateUsersAndAddToRole(IEnumerable<ApplicationUser> users, string role)
         {
-            foreach (var user in users)
+            foreach(var user in users)
             {
-                _userManager.Create(user.Identity, _pwd);
-                _userManager.AddToRole(user.Identity.Id, role);
-                _context.Set<T>().Add(user as T);
+                _userManager.Create(user, _pwd);
+                _userManager.AddToRole(user.Id, role);
             }
 
             _context.SaveChanges();

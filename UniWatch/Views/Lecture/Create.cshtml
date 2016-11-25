@@ -1,0 +1,14 @@
+﻿@model UniWatch.Models.Class
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@Model.Name - Record a new lecture</h3>
+
+@using(Html.BeginForm("Create", "Lecture", new { classId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" />
+    <input type="submit" value="Upload" class="btn btn-default" />
+    <p class="text-danger">@ViewBag.ErrorMessage</p>
+}

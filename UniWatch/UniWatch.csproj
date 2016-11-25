@@ -233,7 +233,9 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ClassController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LectureController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="DataAccess\UserManager.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -242,11 +244,11 @@
     <Compile Include="DataAccess\IClassManager.cs" />
     <Compile Include="DataAccess\IDataAccess.cs" />
     <Compile Include="DataAccess\ILectureManager.cs" />
-    <Compile Include="DataAccess\IStudentManager.cs" />
     <Compile Include="DataAccess\LectureManager.cs" />
     <Compile Include="DataAccess\StorageManager.cs" />
-    <Compile Include="DataAccess\StudentManager.cs" />
+    <Compile Include="DataAccess\IUserManager.cs" />
     <Compile Include="Services\EmailService.cs" />
+    <Compile Include="Services\RecognitionService.cs" />
     <Compile Include="Services\SmsService.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AppDbContext.cs" />
@@ -260,6 +262,7 @@
     <Compile Include="Models\UserModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\LectureViewModels.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -332,6 +335,10 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Lecture\Index.cshtml" />
+    <Content Include="Views\Lecture\Override.cshtml" />
+    <Content Include="Views\Lecture\Create.cshtml" />
+    <Content Include="Views\Lecture\Delete.cshtml" />
     <Content Include="Views\Class\Index.cshtml" />
     <Content Include="Views\Class\Create.cshtml" />
     <Content Include="Views\Class\Delete.cshtml" />

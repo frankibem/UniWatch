@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Configuration;
+using Microsoft.Ajax.Utilities;
 using UniWatch.Models;
+using UniWatch.Services;
 
 namespace UniWatch.DataAccess
 {
@@ -49,8 +53,16 @@ namespace UniWatch.DataAccess
         /// <returns>A list of all lectures for the class</returns>
         public IEnumerable<Lecture> GetTeacherReport(int classId)
         {
-            return _db.Lectures.
-                Where(lecture => lecture.Class.Id == classId);
+            var lectures = _db.Lectures.Where(lecture => lecture.Class.Id == classId).ToList();
+            foreach(var lecture in lectures)
+            {
+                var attendance = _db.Attendance
+                    .Where(a => a.Lecture.Id == lecture.Id)
+                    .Include(a => a.Student);
+                lecture.Attendance = attendance.ToList();
+            }
+
+            return lectures;
         }
 
         /// <summary>
@@ -66,19 +78,41 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
-        /// Updates and saves the given lecture
+        /// Updates/Overrides the values in a lecture
         /// </summary>
-        /// <param name="lecture">The lecture to update</param>
+        /// <param name="lectureId">The id of the lecture to update</param>
+        /// <param name="updates">The list of updates to make</param>
         /// <returns>The updated lecture</returns>
-        public Lecture Update(Lecture lecture)
+        public Lecture Update(int lectureId, IEnumerable<UpdateLectureItem> updates)
         {
-            var existing = _db.Lectures.Find(lecture.Id);
+            var lecture = _db.Lectures.Find(lectureId);
 
             // Doesn't exist
-            if(existing == null)
-                throw new InvalidOperationException("Error updating lecture");
+            if(lecture == null)
+                throw new InvalidOperationException("Error updating lecture. Id not found.");
 
-            _db.Entry(lecture).State = EntityState.Modified;
+            var attendanceMap = new Dictionary<int, StudentAttendance>(lecture.Attendance.Count);
+            foreach(var attendance in lecture.Attendance)
+                attendanceMap.Add(attendance.Student.Id, attendance);
+
+            foreach (var item in updates)
+            {
+                StudentAttendance attendance;
+                if(attendanceMap.TryGetValue(item.StudentId, out attendance))
+                {
+                    if(attendance.Present != item.Present)
+                    {
+                        // Only update if changed
+                        attendance.Present = item.Present;
+                        _db.Attendance.Attach(attendance);
+                        _db.Entry(attendance).Property(a => a.Present).IsModified = true;
+                    }
+                }
+
+                // Assumption: we do not create new attendance objects for students who were not enrolled
+                // at the time the lecture was recorded.
+            }
+
             _db.SaveChanges();
 
             return lecture;
@@ -94,22 +128,104 @@ namespace UniWatch.DataAccess
             var existing = _db.Lectures.Find(lectureId);
 
             if(existing == null)
-                throw new InvalidOperationException("Error deleting class.");
+                throw new InvalidOperationException("Error deleting lecture.");
 
-            return _db.Lectures.Remove(existing);
+            var lecture = _db.Lectures.Remove(existing);
+            _db.SaveChanges();
+
+            return lecture;
 
             // TODO: Delete all other lecture related information (Images (and blobs), Attendance)
         }
 
         /// <summary>
-        /// Create and save a new lecture
+        /// Record a new lecture for the given class using the given images
         /// </summary>
-        /// <param name="lecture">The lecture to create</param>
-        /// <returns>The created lecture</returns>
-        public Lecture Create(Lecture lecture)
+        /// <param name="classId">The id of the class</param>
+        /// <param name="images">The images to detect students from</param>
+        public Lecture RecordLecture(int classId, IEnumerable<Stream> images)
         {
-            // TODO: Implemente Create Lecture
-            return null;
+            var @class = _db.Classes.Find(classId);
+
+            if(@class == null)
+                throw new InvalidOperationException("Error training recognizer");
+            else if(@class.TrainingStatus != TrainingStatus.Trained)
+                throw new InvalidOperationException("Cannot record using untrained recognizer");
+
+            var lecture = new Lecture()
+            {
+                Class = @class,
+                RecordDate = DateTime.Now
+            };
+
+            // Save the images in Azure Storage
+            var storageManager = new StorageManager();
+            var uploadedImages = storageManager.SaveImages(images).Result;
+
+            foreach(var image in uploadedImages)
+                lecture.Images.Add(image);
+
+            // Detect the faces in the images
+            var recognitionService = new RecognitionService();
+            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages).Result;
+
+            // Create StudentAttendance for each student in class
+            var enrollments = _db.Enrollments.Where(e => e.Class.Id == classId)
+                .Include(e => e.Student);
+            Dictionary<Guid, StudentAttendance> attendanceMap = new Dictionary<Guid, StudentAttendance>();
+            foreach(var enrollment in enrollments)
+            {
+                var attendance = new StudentAttendance
+                {
+                    Lecture = lecture,
+                    Student = enrollment.Student,
+                    Present = false
+                };
+                lecture.Attendance.Add(attendance);
+                attendanceMap.Add(enrollment.PersonId, attendance);
+            }
+
+            // Mark detected students as present
+            foreach(var personId in personIds)
+                attendanceMap[personId].Present = true;
+
+            _db.Lectures.Add(lecture);
+            _db.SaveChanges();
+
+            // Alert absent students
+            var absent = lecture.Attendance.Where(a => !a.Present)
+                .Select(a => a.Student);
+            AlertAbsentStudents(absent, @class);
+
+            return lecture;
+        }
+
+        /// <summary>
+        /// Alert the given students via email and sms of their absence
+        /// </summary>
+        /// <param name="students">The students to alert</param>
+        /// <param name="class">The class to alert students for</param>
+        private void AlertAbsentStudents(IEnumerable<Student> students, Class @class)
+        {
+            EmailService emailService = new EmailService();
+            SmsService smsService = new SmsService();
+            List<Task> tasks = new List<Task>();
+
+            var fromEmail = WebConfigurationManager.AppSettings["EmailFrom"];
+            var fromSms = WebConfigurationManager.AppSettings["TwilioSmsNumber"];
+            string subject = $"Attendance Information for for \"{@class.Name}\"";
+            string message = $"You have been marked absent for \"{@class.Name}\" on {DateTime.Now.ToShortDateString()}";
+
+            foreach(var student in students)
+            {
+                var user = _db.Users.Find(student.IdentityId);
+                if(user != null)
+                {
+                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, "Attendance Information", message));
+                    smsService.SendMessage("", user.PhoneNumber, message);
+                }
+            }
+            Task.WaitAll(tasks.ToArray());
         }
 
         public void Dispose()

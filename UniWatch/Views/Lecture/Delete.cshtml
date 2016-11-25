@@ -1,0 +1,20 @@
+﻿@model UniWatch.Models.Lecture
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Delete Lecture recorded on @Model.RecordDate.ToShortDateString()</h3>
+<p>
+    This will delete all information related to this lecture and cannot be undone.
+</p>
+
+
+@using (Html.BeginForm("Delete", "Lecture", new { lectureId = Model.Id, classId = Model.Class.Id }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-actions no-color">
+        @Html.ActionLink("Cancel", "Override", "Lecture", new { lectureId = Model.Id }, new { @class = "btn btn-default" })
+        <input type="submit" value="Confirm" class="btn btn-danger" />
+    </div>
+}
