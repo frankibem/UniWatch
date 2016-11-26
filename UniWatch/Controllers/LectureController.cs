@@ -66,7 +66,7 @@ namespace UniWatch.Controllers
             // then display an error
             if(lvm == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             return View(lvm);
@@ -85,7 +85,7 @@ namespace UniWatch.Controllers
 
             if(lecture == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lvm.Lecture.Id}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             _manager.LectureManager.Update(lecture.Id, lvm.LectureItems);
@@ -103,7 +103,7 @@ namespace UniWatch.Controllers
 
             if(@class == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             return View(@class);
@@ -121,7 +121,7 @@ namespace UniWatch.Controllers
             var @class = _manager.ClassManager.GetById(classId);
             if(@class == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             if(!files.Any())
@@ -174,7 +174,7 @@ namespace UniWatch.Controllers
 
             if(lecture == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture with id {lectureId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             return View(lecture);
@@ -194,7 +194,7 @@ namespace UniWatch.Controllers
 
             if(lecture == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No lecture given");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             return RedirectToAction("Index", new { classId = classId });

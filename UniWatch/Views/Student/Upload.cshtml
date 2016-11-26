@@ -1,0 +1,15 @@
+﻿@model UniWatch.Models.Student
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@string.Format($"{Model.FirstName} {Model.LastName}") - Upload images of student's face</h3>
+<hr/>
+
+@using (Html.BeginForm("Upload", "Student", new { classId = ViewBag.ClassId, studentId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" />
+    <input type="submit" value="Upload" class="btn btn-default" />
+    <p class="text-danger">@ViewBag.ErrorMessage</p>
+}

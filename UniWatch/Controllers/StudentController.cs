@@ -195,9 +195,16 @@ namespace UniWatch.Controllers
         /// </summary>
         /// <param name="studentId">The id of the student</param>
         [HttpGet]
-        public ActionResult Upload(int studentId)
+        public ActionResult Upload(int classId, int studentId)
         {
-            throw new NotImplementedException();
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
+            if (student == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            ViewBag.ClassId = classId;
+
+            return View(student);
         }
 
         /// <summary>
@@ -207,7 +214,7 @@ namespace UniWatch.Controllers
         /// <param name="files">The images to upload</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Upload(int studentId, IEnumerable<HttpPostedFileBase> files)
+        public ActionResult Upload(int classId, int studentId, IEnumerable<HttpPostedFileBase> files)
         {
             var student = _dataAccess.UserManager.GetStudentById(studentId);
             if (student == null)
@@ -218,7 +225,7 @@ namespace UniWatch.Controllers
             if (!files.Any())
             {
                 ViewBag.ErrorMessage = "No file selected";
-                //return View(student);
+                return View(student);
             }
 
             var validImageTypes = new string[]
@@ -237,21 +244,20 @@ namespace UniWatch.Controllers
                 if (file.ContentLength <= 0 /*|| file.ContentLength >= MAX_SIZE*/)
                 {
                     ViewBag.ErrorMessage = "File must not be empty and must not exceed MAX_SIZE";
-                    //return View(student);
+                    return View(student);
                 }
                 else if (!validImageTypes.Contains(file.ContentType))
                 {
                     ViewBag.ErrorMessage = "File type must be either gif, jpeg or png";
-                    //return View(student);
+                    return View(student);
                 }
 
                 images.Add(file.InputStream);
             }
 
             // TODO: Uncomment when services are functional
-            //_manager.LectureManager.RecordLecture(@class.Id, images);
-            throw new NotImplementedException();
-            return RedirectToAction("Index", "Lecture", new { studentId = student.Id });
+            //_dataAccess.UserManager.SetStudentProfile(student.Id, images);
+            return RedirectToAction("Index", "Student", new { classId = classId });
         }
     }
 }
