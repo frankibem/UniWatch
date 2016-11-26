@@ -10,6 +10,7 @@
 @{
     <p>
         @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
     </p>
 
     if(!Model.Lectures.Any())
@@ -60,5 +61,9 @@
                 </tbody>
             </table>
         </div>
+        <p>
+            @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
+            @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
+        </p>
     }
 }

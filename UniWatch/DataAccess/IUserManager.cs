@@ -47,6 +47,12 @@ namespace UniWatch.DataAccess
         User GetUser(string identityId);
 
         /// <summary>
+        /// Returns a list of all students whose id matches the given id
+        /// </summary>
+        /// <param name="id">The search string</param>
+        IEnumerable<Student> SearchStudent(string id);
+
+        /// <summary>
         /// Sets the images that make up the facial profile for a student
         /// </summary>
         /// <param name="studentId">The id of the student</param>

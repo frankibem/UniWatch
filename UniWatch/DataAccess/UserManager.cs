@@ -107,6 +107,19 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
+        /// Returns a list of all students whose id matches the given id
+        /// </summary>
+        /// <param name="id">The search string</param>
+        /// <remarks>Returns an empty list if given a null or empty search string</remarks>
+        public IEnumerable<Student> SearchStudent(string id)
+        {
+            if(string.IsNullOrEmpty(id))
+                return new List<Student>();
+
+            return _db.Students.Where(s => s.Id.ToString().Contains(id));
+        }
+
+        /// <summary>
         /// Sets the images that make up the facial profile for a student
         /// </summary>
         /// <param name="studentId">The id of the student</param>

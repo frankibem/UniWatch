@@ -1,0 +1,43 @@
+﻿@model UniWatch.ViewModels.EnrollIndexViewModel
+
+<h3>Students in @Model.Class.Name</h3>
+<hr />
+
+<p>
+    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = Model.Class.Id }, new { @class = "btn btn-primary" })
+</p>
+
+@if (!Model.EnrolledStudents.Any())
+{
+    <p>No students currently enrolled in this class.</p>
+}
+else {
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-inverse">
+                <tr>
+                    <th>
+                        First Name
+                    </th>
+                    <th>
+                        Last Name
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var student in Model.EnrolledStudents)
+                {
+                    <tr>
+                        <td>@student.FirstName</td>
+                        <td>@student.LastName</td>
+                        <td>
+                            @Html.ActionLink("UnEnroll", "UnEnroll", "Student", new { classId = Model.Class.Id, studentId = student.Id }, new { @class = "btn btn-danger" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
