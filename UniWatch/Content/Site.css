@@ -27,3 +27,13 @@ textarea {
 .student-name {
     vertical-align: middle !important;
 }
+
+/* Carousel */
+.carousel {
+    max-height: 400px;
+}
+
+.carousel-inner > .item > img {
+    margin: 0 auto;
+    max-height: 400px;
+}

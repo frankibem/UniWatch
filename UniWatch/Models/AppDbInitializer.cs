@@ -100,6 +100,44 @@ namespace UniWatch.Models
                 new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
                 new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-9) }
             };
+
+            // Add some lecture images
+            var images = new List<UploadedImage>
+            {
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/3547/3547972-close-up-of-students-studying.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/8312/8312548-graduation-students.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/5892/5892035-interesting-book.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/24e/scotch-tape-1634836.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/456/toilet-1635264.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/4ac/dirty-field-kitchen-1633199.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/123/golden-retriever-1633164.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/22b/autumn-1632745.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/previews/329/the-centenary-tree-1632713.jpg" }
+            };
+            _context.Images.AddRange(images);
+            _context.SaveChanges();
+
+            lectures[0].Images = new List<UploadedImage>
+            {
+                images[0],
+                images[1],
+                images[2],
+                images[3],
+                images[4]
+            };
+
+            lectures[1].Images = new List<UploadedImage>
+            {
+                images[5]
+            };
+
+            lectures[2].Images = new List<UploadedImage>
+            {
+                images[6],
+                images[7],
+                images[8]
+            };
+
             _context.Lectures.AddRange(lectures);
             _context.SaveChanges();
 
