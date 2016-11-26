@@ -22,6 +22,50 @@
         <input type="submit" value="Update" class="btn btn-success" />
         @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
         <p />
+        if (Model.Lecture.Images.Any())
+        {
+            <div id="divCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-target="#divCarousel" data-slide-to="0" class="active"></li>
+                    @for (var i = 1; i < Model.Lecture.Images.Count; i++)
+                    {
+                        <li data-target="#divCarousel" data-slide-to="@i"></li>
+                    }
+                </ol>
+
+                <!-- Wrapper for slides -->
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        @{ var image = Model.Lecture.Images.ElementAt(0); }
+                        <img src="@image.Url" alt="@string.Format($"Lecture Image #{image.Id}")">
+                    </div>
+
+                    @for (var i = 1; i < Model.Lecture.Images.Count; i++)
+                    {
+                        <div class="item">
+                            @{ image = Model.Lecture.Images.ElementAt(i); }
+                            <img src="@image.Url" alt="@string.Format($"Lecture Image #{image.Id}")">
+                        </div>
+                    }
+                </div>
+
+                <!-- Left and right controls -->
+                <a class="left carousel-control" href="#divCarousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#divCarousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        }
+        else
+        {
+            <h4>There are no attendance images for this lecture</h4>
+        }
+        <p />
         <div class="table-responsive">
             <table class="table table-hover table-bordered table-striped">
                 <thead>
@@ -39,7 +83,6 @@
                                 @Html.HiddenFor(model => model.LectureItems[i].LectureId)
                                 @Html.HiddenFor(model => model.LectureItems[i].StudentId)
                                 @Html.CheckBoxFor(model => model.LectureItems[i].Present)
-
                             </td>
                         </tr>
                     }
