@@ -60,6 +60,7 @@ namespace UniWatch.DataAccess
                 Number = number,
                 Section = section,
                 Semester = semester,
+                Year = year,
                 TrainingStatus = TrainingStatus.UnTrained,
                 Teacher = teacher
             };
@@ -68,8 +69,8 @@ namespace UniWatch.DataAccess
             _db.SaveChanges();
 
             // Create the PersonGroup for this class
-            var faceClient = RecognitionService.GetFaceClient();
-            faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name).Wait();
+            //var faceClient = RecognitionService.GetFaceClient();
+            //faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name).Wait();
 
             return added;
         }
@@ -81,7 +82,9 @@ namespace UniWatch.DataAccess
         /// <returns>The class with the given id or null if not found</returns>
         public Class GetById(int classId)
         {
-            return _db.Classes.Find(classId);
+            return _db.Classes.Where(c => c.Id == classId)
+                .Include(c => c.Teacher)
+                .FirstOrDefault();
         }
 
         /// <summary>
@@ -195,13 +198,16 @@ namespace UniWatch.DataAccess
         /// <param name="classId">Id of the class to delete</param>
         public Class DeleteClass(int classId)
         {
-            var existing = _db.Classes.Find(classId);
+            var @class = _db.Classes.Find(classId);
 
-            if(existing == null)
+            if(@class == null)
                 throw new InvalidOperationException("Error deleting class.");
 
-            return _db.Classes.Remove(existing);
+            _db.Classes.Remove(@class);
+            _db.SaveChanges();
 
+            return @class;
+        
             // TODO: Delete all other class related data (Lectures, Enrollments)
         }
 
