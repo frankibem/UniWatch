@@ -13,16 +13,14 @@ namespace UniWatch.Controllers
     {
         private IDataAccess _dataAccess;
 
-        public ClassController():this(new DataAccess.DataAccess())
+        public ClassController()
         {
             _dataAccess = new DataAccess.DataAccess();
         }
-
-        public ClassController(IDataAccess dataAccess)
+         public ClassController(IDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
-
         //GET: Index
         /// <summary>
         /// Displays all classes taught by the teacher
@@ -110,12 +108,12 @@ namespace UniWatch.Controllers
         public ActionResult DeleteConfirmed(int classId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            var teacherId = @class.Teacher.Id;
-
             if (@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
+           
+            var teacherId = @class.Teacher.Id;
 
             _dataAccess.ClassManager.DeleteClass(classId);
             return RedirectToAction("Index", new { teacherId = teacherId });
