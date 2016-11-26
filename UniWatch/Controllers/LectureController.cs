@@ -124,7 +124,7 @@ namespace UniWatch.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            if(!files.Any() || (files.Count() == 0 && files.ElementAt(0) == null))
+            if(!files.Any() || (files.Count() == 1 && files.ElementAt(0) == null))
             {
                 ViewBag.ErrorMessage = "No file selected";
                 return View(@class);
