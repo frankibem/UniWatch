@@ -40,11 +40,9 @@ namespace UniWatch.DataAccess
         Teacher GetTeacherById(int teacherId);
 
         /// <summary>
-        /// Returns the user associated with the given identity
+        /// Returns the logged in user
         /// </summary>
-        /// <param name="identity">The id underlying identity for the user</param>
-        /// <returns>The User associated with the given identity</returns>
-        User GetUser(string identityId);
+        User GetUser();
 
         /// <summary>
         /// Returns a list of all students whose id matches the given id

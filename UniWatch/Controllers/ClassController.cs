@@ -9,49 +9,49 @@ using UniWatch.Models;
 
 namespace UniWatch.Controllers
 {
+    [Authorize(Roles = "Teacher")]
     public class ClassController : Controller
     {
         private IDataAccess _dataAccess;
 
-        public ClassController()
+        public ClassController() : this(new DataAccess.DataAccess())
         {
-            _dataAccess = new DataAccess.DataAccess();
         }
-         public ClassController(IDataAccess dataAccess)
+
+        public ClassController(IDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }
+
         //GET: Index
         /// <summary>
         /// Displays all classes taught by the teacher
         /// </summary>
-        /// <param name="teacherId">Id of the teacher</param>
-        public ActionResult Index(int teacherId)
+        [OverrideAuthorization]
+        [Authorize]
+        public ActionResult Index()
         {
-            var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
-                if (teacher==null)
+            // TODO: modify view to show appropriate information for either user type
+            var user = _dataAccess.UserManager.GetUser();
+            if(user is Teacher)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                Teacher teacher = user as Teacher;
+                return View(_dataAccess.ClassManager.GetClassesForTeacher(teacher.Id));
             }
-            ViewBag.TeacherId = teacherId;
-            return View(_dataAccess.ClassManager.GetClassesForTeacher(teacherId));
+            else
+            {
+                Student student = user as Student;
+                return View(_dataAccess.ClassManager.GetClassesForStudent(student.Id));
+            }
         }
-
 
         // GET: Create
         /// <summary>
-        /// Sends user to the create class page
+        /// Returns the view to create a new class
         /// </summary>
-        /// <param name="teacherId">Id of the teacher</param>
-        public ActionResult Create(int teacherId)
+        public ActionResult Create()
         {
-            var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
-            if (teacher == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-           // var teacher = _dataAccess.UserManager.GetTeacherById(teacherId);
-            return View(new Class() { Teacher = teacher });
+            return View();
         }
 
         //POST: Create
@@ -59,25 +59,24 @@ namespace UniWatch.Controllers
         /// Create class for the teacher
         /// </summary>
         /// <param name="class">Model containing information to create the class</param>
-        /// <param name="teacherId">Id of the teacher</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Name,Number,Section,Semester,Year")] Class @class, int teacherId)
+        public ActionResult Create([Bind(Include = "Name,Number,Section,Semester,Year")] Class @class)
         {
-            if (!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
                 return View(@class);
             }
             try
             {
-                var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacherId);
+                var teacher = _dataAccess.UserManager.GetUser() as Teacher;
+                var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacher.Id);
                 return RedirectToAction("Index", new { teacherId = created.Teacher.Id });
             }
-            catch (InvalidOperationException)
+            catch(InvalidOperationException)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Conflict);
             }
-          
         }
 
         //GET: Delete
@@ -88,7 +87,7 @@ namespace UniWatch.Controllers
         public ActionResult Delete(int classId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
@@ -108,11 +107,11 @@ namespace UniWatch.Controllers
         public ActionResult DeleteConfirmed(int classId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
             }
-           
+
             var teacherId = @class.Teacher.Id;
 
             _dataAccess.ClassManager.DeleteClass(classId);

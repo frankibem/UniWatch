@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Web;
 using UniWatch.Models;
+using Microsoft.AspNet.Identity;
 
 namespace UniWatch.DataAccess
 {
@@ -94,14 +96,14 @@ namespace UniWatch.DataAccess
         /// <summary>
         /// Returns the user associated with the given identity
         /// </summary>
-        /// <param name="identity">The id underlying identity object for the user</param>
         /// <returns>The User associated with the given identity</returns>
-        public User GetUser(string identityId)
+        public User GetUser()
         {
-            var teacher = _db.Teachers.Where(t => t.IdentityId == identityId).FirstOrDefault();
+            var userId = HttpContext.Current.User.Identity.GetUserId<string>();
+            var teacher = _db.Teachers.Where(t => t.IdentityId == userId).FirstOrDefault();
 
             if(teacher == null)
-                return _db.Students.Where(s => s.IdentityId == identityId).FirstOrDefault();
+                return _db.Students.Where(s => s.IdentityId == userId).FirstOrDefault();
 
             return teacher;
         }
