@@ -96,7 +96,6 @@ namespace UniWatch.Controllers
         /// Display the
         /// </summary>
         /// <param name="classId"></param>
-        /// <returns></returns>
         [HttpGet]
         public ActionResult Create(int classId)
         {
