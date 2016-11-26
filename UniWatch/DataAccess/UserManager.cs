@@ -94,9 +94,8 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
-        /// Returns the user associated with the given identity
+        /// Returns the logged in user
         /// </summary>
-        /// <returns>The User associated with the given identity</returns>
         public User GetUser()
         {
             var userId = HttpContext.Current.User.Identity.GetUserId<string>();
