@@ -99,12 +99,13 @@ namespace UniWatch.DataAccess
         public User GetUser()
         {
             var userId = HttpContext.Current.User.Identity.GetUserId<string>();
-            var teacher = _db.Teachers.Where(t => t.IdentityId == userId).FirstOrDefault();
 
-            if(teacher == null)
-                return _db.Students.Where(s => s.IdentityId == userId).FirstOrDefault();
+            var teacher = _db.Teachers.FirstOrDefault(t => t.IdentityId == userId);
+            if(teacher != null)
+                return teacher;
 
-            return teacher;
+            var student = _db.Students.FirstOrDefault(s => s.IdentityId == userId);
+            return student;
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace UniWatch.Controllers
         /// Displays all classes taught by the teacher
         /// </summary>
         [OverrideAuthorization]
-        [Authorize]
+        [Authorize(Roles = "Teacher, Student")]
         public ActionResult Index()
         {
             // TODO: modify view to show appropriate information for either user type
@@ -71,7 +71,7 @@ namespace UniWatch.Controllers
             {
                 var teacher = _dataAccess.UserManager.GetUser() as Teacher;
                 var created = _dataAccess.ClassManager.CreateClass(@class.Name, @class.Number, @class.Section, @class.Semester, @class.Year, teacher.Id);
-                return RedirectToAction("Index", new { teacherId = created.Teacher.Id });
+                return RedirectToAction("Index");
             }
             catch(InvalidOperationException)
             {
@@ -89,7 +89,7 @@ namespace UniWatch.Controllers
             var @class = _dataAccess.ClassManager.GetById(classId);
             if(@class == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             return View(@class);
@@ -109,7 +109,7 @@ namespace UniWatch.Controllers
             var @class = _dataAccess.ClassManager.GetById(classId);
             if(@class == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
             var teacherId = @class.Teacher.Id;

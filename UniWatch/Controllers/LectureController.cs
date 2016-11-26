@@ -29,7 +29,7 @@ namespace UniWatch.Controllers
         /// <param name="classId">The class ID</param>
         [HttpGet]
         [OverrideAuthorization]
-        [Authorize]
+        [Authorize(Roles = "Teacher, Student")]
         public ActionResult Index(int classId)
         {
             // TODO: modify view to show appropriate information for either user type
