@@ -100,6 +100,29 @@ namespace UniWatch.Models
                 new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-7) },
                 new Lecture() { Class = classes[0], RecordDate = DateTime.Today.AddDays(-9) }
             };
+
+            lectures[0].Images = new List<UploadedImage>
+            {
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/3547/3547972-close-up-of-students-studying.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/5892/5892035-interesting-book.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/8312/8312548-graduation-students.jpg" }
+            };
+
+            lectures[1].Images = new List<UploadedImage>
+            {
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/5892/5892035-interesting-book.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/8312/8312548-graduation-students.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/3547/3547972-close-up-of-students-studying.jpg" },
+
+            };
+
+            lectures[2].Images = new List<UploadedImage>
+            {
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/3547/3547972-close-up-of-students-studying.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/8312/8312548-graduation-students.jpg" },
+                new UploadedImage { BlobName = "Dummy", CreationTime = DateTime.Now, Url = "http://images.freeimages.com/images/premium/previews/5892/5892035-interesting-book.jpg" },
+            };
+
             _context.Lectures.AddRange(lectures);
             _context.SaveChanges();
 
