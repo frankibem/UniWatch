@@ -10,6 +10,7 @@ using UniWatch.ViewModels;
 
 namespace UniWatch.Controllers
 {
+    [Authorize(Roles = "Teacher")]
     public class LectureController : Controller
     {
         private readonly IDataAccess _manager;
@@ -27,15 +28,28 @@ namespace UniWatch.Controllers
         /// </summary>
         /// <param name="classId">The class ID</param>
         [HttpGet]
+        [OverrideAuthorization]
+        [Authorize(Roles = "Teacher, Student")]
         public ActionResult Index(int classId)
         {
-            var report = GetTeacherReport(classId);
-            if(report == null)
+            // TODO: modify view to show appropriate information for either user type
+            var user = _manager.UserManager.GetUser();
+            if(user is Teacher)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, $"No class with id {classId}");
-            }
+                Teacher teacher = user as Teacher;
+                var report = GetTeacherReport(classId);
+                if(report == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
 
-            return View(report);
+                return View(report);
+            }
+            else
+            {
+                Student student = user as Student;
+                return View(new TeacherReportViewModel());
+            }
         }
 
         /// <summary>

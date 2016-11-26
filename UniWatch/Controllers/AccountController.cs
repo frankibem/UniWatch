@@ -77,9 +77,20 @@ namespace UniWatch.Controllers
                 return View(model);
             }
 
+            // Redirect to class page if no return url
+            if(string.IsNullOrEmpty(returnUrl))
+                returnUrl = Url.Action("Index", "Class");
+
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            if(user == null)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
+            var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
             switch(result)
             {
                 case SignInStatus.Success:
@@ -155,16 +166,18 @@ namespace UniWatch.Controllers
         {
             if(ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.FirstName, Email = model.Email, PhoneNumber = model.PhoneNumber };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if(result.Succeeded)
                 {
                     switch(model.UserType)
                     {
                         case UserType.Teacher:
+                            await UserManager.AddToRoleAsync(user.Id, "Teacher");
                             _dataAccess.UserManager.CreateTeacher(model.FirstName, model.LastName, user);
                             break;
                         case UserType.Student:
+                            await UserManager.AddToRoleAsync(user.Id, "Student");
                             _dataAccess.UserManager.CreateStudent(model.FirstName, model.LastName, user);
                             break;
                     }
@@ -177,7 +190,7 @@ namespace UniWatch.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Class");
                 }
                 AddErrors(result);
             }

@@ -10,6 +10,7 @@ using UniWatch.ViewModels;
 
 namespace UniWatch.Controllers
 {
+    [Authorize(Roles = "Teacher")]
     public class StudentController : Controller
     {
         private IDataAccess _dataAccess;
