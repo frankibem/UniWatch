@@ -166,16 +166,18 @@ namespace UniWatch.Controllers
         {
             if(ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.FirstName, Email = model.Email, PhoneNumber = model.PhoneNumber };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, PhoneNumber = model.PhoneNumber };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if(result.Succeeded)
                 {
                     switch(model.UserType)
                     {
                         case UserType.Teacher:
+                            await UserManager.AddToRoleAsync(user.Id, "Teacher");
                             _dataAccess.UserManager.CreateTeacher(model.FirstName, model.LastName, user);
                             break;
                         case UserType.Student:
+                            await UserManager.AddToRoleAsync(user.Id, "Student");
                             _dataAccess.UserManager.CreateStudent(model.FirstName, model.LastName, user);
                             break;
                     }
@@ -188,7 +190,7 @@ namespace UniWatch.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Class");
                 }
                 AddErrors(result);
             }

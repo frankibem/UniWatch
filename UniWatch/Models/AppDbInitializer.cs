@@ -40,9 +40,9 @@ namespace UniWatch.Models
             // Create some teachers
             var teacherList = new List<ApplicationUser>
             {
-                new ApplicationUser() { UserName = "Temple", Email = "witman@uniwatch.com", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "Daniel", Email = "payne@uniwatch.com", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "Elton", Email = "grice@uniwatch.com", PhoneNumber = "5551231234" }
+                new ApplicationUser() { UserName = "witman@uniwatch.com", Email = "witman@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "payne@uniwatch.com", Email = "payne@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "grice@uniwatch.com", Email = "grice@uniwatch.com", PhoneNumber = "5551231234" }
             };
             CreateUsersAndAddToRole(teacherList, teacherRole);
 
@@ -56,10 +56,10 @@ namespace UniWatch.Models
             // Create some students
             var studentList = new List<ApplicationUser>
             {
-                new ApplicationUser() { UserName = "Josh", Email = "jos@uniwatch.com", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "Frank", Email = "frank@uniwatch.com", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "Claire", Email = "claire@uniwatch.com", PhoneNumber = "5551231234" },
-                new ApplicationUser() { UserName = "Patrick", Email = "patrick@uniwatch.com", PhoneNumber = "5551231234" }
+                new ApplicationUser() { UserName = "jos@uniwatch.com", Email = "jos@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "frank@uniwatch.com", Email = "frank@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "claire@uniwatch.com", Email = "claire@uniwatch.com", PhoneNumber = "5551231234" },
+                new ApplicationUser() { UserName = "patrick@uniwatch.com", Email = "patrick@uniwatch.com", PhoneNumber = "5551231234" }
             };
             CreateUsersAndAddToRole(studentList, studentRole);
 
