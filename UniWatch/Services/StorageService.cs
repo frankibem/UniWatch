@@ -93,13 +93,13 @@ namespace UniWatch.Services
         /// Deletes a stored image
         /// </summary>
         /// <param name="image">The image to delete</param>
-        public async Task DeleteImage(UploadedImage image)
+        public void DeleteImage(UploadedImage image)
         {
             if(image == null)
                 return;
 
             CloudBlockBlob imageBlob = _container.GetBlockBlobReference(image.BlobName);
-            await imageBlob.DeleteIfExistsAsync();
+            Task.Run(() => imageBlob.DeleteIfExistsAsync()).Wait();
         }
 
         /// <summary>

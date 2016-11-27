@@ -215,12 +215,25 @@ namespace UniWatch.DataAccess
             if(@class == null)
                 throw new InvalidOperationException("Error deleting class.");
 
+            // Delete all lectures
+            var lectureManager = new LectureManager(_db);
+            var lectures = new List<Lecture>(@class.Lectures);
+            foreach(var lecture in lectures)
+            {
+                lectureManager.Delete(lecture.Id);
+            }
+
+            // Delete all enrollments
+            _db.Enrollments.RemoveRange(@class.Enrollment);
+
+            // Delete cognitive data
+            var faceClient = RecognitionService.GetFaceClient();
+            Task.Run(() => faceClient.DeletePersonGroupAsync(@class.Id.ToString())).Wait();          
+
             _db.Classes.Remove(@class);
             _db.SaveChanges();
 
             return @class;
-
-            // TODO: Delete all other class related data (Lectures, Enrollments)
         }
 
         /// <summary>
