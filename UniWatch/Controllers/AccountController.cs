@@ -77,10 +77,6 @@ namespace UniWatch.Controllers
                 return View(model);
             }
 
-            // Redirect to class page if no return url
-            if(string.IsNullOrEmpty(returnUrl))
-                returnUrl = Url.Action("Index", "Class");
-
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var user = await UserManager.FindByEmailAsync(model.Email);
@@ -94,6 +90,14 @@ namespace UniWatch.Controllers
             switch(result)
             {
                 case SignInStatus.Success:
+                    // Redirect to class page if no return url
+                    if(string.IsNullOrEmpty(returnUrl))
+                    {
+                        if(UserManager.IsInRole(user.Id, "Admin"))
+                            returnUrl = Url.Action("Index", "Admin");
+                        else
+                            returnUrl = Url.Action("Index", "Class");
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");

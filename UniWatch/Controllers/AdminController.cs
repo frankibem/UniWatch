@@ -49,9 +49,9 @@ namespace UniWatch.Controllers
                     new StorageService().ClearAll();
                     break;
                 case "all":
-                    _dataAccess.DbContext.Database.Delete();
                     RecognitionService.ClearAll();
                     new StorageService().ClearAll();
+                    _dataAccess.DbContext.Database.Delete();
                     break;
                 default:
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);

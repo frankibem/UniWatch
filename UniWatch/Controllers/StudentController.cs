@@ -33,7 +33,7 @@ namespace UniWatch.Controllers
         public ActionResult Index(int classId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -54,7 +54,7 @@ namespace UniWatch.Controllers
         public ActionResult Enroll(int classId)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -73,22 +73,22 @@ namespace UniWatch.Controllers
         /// that match the given id
         /// </summary>
         /// <param name="classId">The id of the class</param>
-        /// <param name="studentId">The student search parameter</param>
+        /// <param name="searchTerm">The student search parameter</param>
         [HttpPost]
-        public ActionResult Search(int classId, string studentId)
+        public ActionResult Search(int classId, string searchTerm)
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
-            if (@class == null)
+            if(@class == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            var found = _dataAccess.UserManager.SearchStudent(studentId);
+            var found = _dataAccess.UserManager.SearchStudent(searchTerm);
             var enrolled = _dataAccess.ClassManager.GetEnrolledStudents(classId);
 
             // Set of student ids (for enrolled students)
             HashSet<int> enrolledSet = new HashSet<int>();
-            foreach (var student in enrolled)
+            foreach(var student in enrolled)
                 enrolledSet.Add(student.Id);
 
             EnrollStudentViewModel viewModel = new EnrollStudentViewModel
@@ -96,7 +96,7 @@ namespace UniWatch.Controllers
                 Class = @class
             };
 
-            foreach (Student student in found)
+            foreach(Student student in found)
             {
                 viewModel.StudentsFound.Add(new StudentFound
                 {
@@ -121,7 +121,7 @@ namespace UniWatch.Controllers
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
             var student = _dataAccess.UserManager.GetStudentById(studentId);
-            if (@class == null || student == null)
+            if(@class == null || student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -130,7 +130,7 @@ namespace UniWatch.Controllers
             {
                 _dataAccess.ClassManager.EnrollStudent(classId, studentId);
             }
-            catch (InvalidOperationException)
+            catch(InvalidOperationException)
             {
                 // Student is already enrolled in that class.
                 return new HttpStatusCodeResult(HttpStatusCode.Conflict);
@@ -151,7 +151,7 @@ namespace UniWatch.Controllers
             var @class = _dataAccess.ClassManager.GetById(classId);
             var student = _dataAccess.UserManager.GetStudentById(studentId);
 
-            if (@class == null || student == null)
+            if(@class == null || student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -172,7 +172,7 @@ namespace UniWatch.Controllers
         {
             var @class = _dataAccess.ClassManager.GetById(classId);
             var student = _dataAccess.UserManager.GetStudentById(studentId);
-            if (@class == null || student == null)
+            if(@class == null || student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
@@ -181,7 +181,7 @@ namespace UniWatch.Controllers
             {
                 _dataAccess.ClassManager.UnEnrollStudent(classId, studentId);
             }
-            catch (InvalidOperationException)
+            catch(InvalidOperationException)
             {
                 // Student is not enrolled in that class.
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -191,18 +191,35 @@ namespace UniWatch.Controllers
         }
 
         /// <summary>
+        /// Returns the view to search for a student (for uploading profile images)
+        /// </summary>
+        /// <param name="searchTerm">The parameter used to search for a student</param>
+        [HttpGet]
+        [ActionName("Profile")]
+        public ActionResult StudentProfile(string searchTerm)
+        {
+            var students = _dataAccess.UserManager.SearchStudent(searchTerm);
+
+            if(Request.IsAjaxRequest())
+            {
+                return PartialView("_ProfileSearch", students);
+            }
+
+            return View(students);
+        }
+
+        /// <summary>
         /// Displays a page to upload images of the student's face
         /// </summary>
         /// <param name="studentId">The id of the student</param>
         [HttpGet]
-        public ActionResult Upload(int classId, int studentId)
+        public ActionResult Upload(int studentId)
         {
             var student = _dataAccess.UserManager.GetStudentById(studentId);
-            if (student == null)
+            if(student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            ViewBag.ClassId = classId;
 
             return View(student);
         }
@@ -214,15 +231,15 @@ namespace UniWatch.Controllers
         /// <param name="files">The images to upload</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Upload(int classId, int studentId, IEnumerable<HttpPostedFileBase> files)
+        public ActionResult Upload(int studentId, IEnumerable<HttpPostedFileBase> files)
         {
             var student = _dataAccess.UserManager.GetStudentById(studentId);
-            if (student == null)
+            if(student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            if (!files.Any() || (files.Count() == 1 && files.ElementAt(0) == null))
+            if(!files.Any() || (files.Count() == 1 && files.ElementAt(0) == null))
             {
                 ViewBag.ErrorMessage = "No file selected";
                 return View(student);
@@ -238,15 +255,15 @@ namespace UniWatch.Controllers
             };
 
             var images = new List<Stream>(files.Count());
-            foreach (var file in files)
+            foreach(var file in files)
             {
                 // TODO: Determine upload limit
-                if (file.ContentLength <= 0 /*|| file.ContentLength >= MAX_SIZE*/)
+                if(file.ContentLength <= 0 /*|| file.ContentLength >= MAX_SIZE*/)
                 {
                     ViewBag.ErrorMessage = "File must not be empty and must not exceed MAX_SIZE";
                     return View(student);
                 }
-                else if (!validImageTypes.Contains(file.ContentType))
+                else if(!validImageTypes.Contains(file.ContentType))
                 {
                     ViewBag.ErrorMessage = "File type must be either gif, jpeg or png";
                     return View(student);
@@ -256,7 +273,7 @@ namespace UniWatch.Controllers
             }
 
             _dataAccess.UserManager.SetStudentProfile(student.Id, images);
-            return RedirectToAction("Index", "Student", new { classId = classId });
+            return RedirectToAction("Upload", new { studentId = student.Id });
         }
     }
 }
