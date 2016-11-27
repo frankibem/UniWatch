@@ -45,7 +45,7 @@ namespace UniWatch.DataAccess
         User GetUser();
 
         /// <summary>
-        /// Returns a list of all students whose id matches the given id
+        /// Returns a list of all students whose name or id contains the given search string
         /// </summary>
         /// <param name="id">The search string</param>
         IEnumerable<Student> SearchStudent(string id);

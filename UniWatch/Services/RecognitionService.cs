@@ -73,14 +73,14 @@ namespace UniWatch.Services
         /// <summary>
         /// Clears all data stored in the service
         /// </summary>
-        public async static void ClearAll()
+        public static void ClearAll()
         {
             var faceClient = GetFaceClient();
-            var personGroups = await faceClient.ListPersonGroupsAsync();
+            var personGroups = Task.Run(() => faceClient.ListPersonGroupsAsync()).Result;
 
             foreach(var group in personGroups)
             {
-                await faceClient.DeletePersonGroupAsync(group.PersonGroupId);
+                Task.Run(() => faceClient.DeletePersonGroupAsync(group.PersonGroupId)).Wait();
             }
         }
     }

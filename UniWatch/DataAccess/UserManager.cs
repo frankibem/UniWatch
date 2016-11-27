@@ -110,16 +110,16 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
-        /// Returns a list of all students whose id matches the given id
+        /// Returns a list of all students whose name or id contains the given search string
         /// </summary>
-        /// <param name="id">The search string</param>
+        /// <param name="searchString">The search string</param>
         /// <remarks>Returns an empty list if given a null or empty search string</remarks>
-        public IEnumerable<Student> SearchStudent(string id)
+        public IEnumerable<Student> SearchStudent(string searchString)
         {
-            if(string.IsNullOrEmpty(id))
+            if(string.IsNullOrEmpty(searchString))
                 return new List<Student>();
 
-            return _db.Students.Where(s => s.Id.ToString().Contains(id));
+            return _db.Students.Where(s => (s.Id.ToString() + s.FirstName + s.LastName).Contains(searchString));
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace UniWatch.DataAccess
 
             // Store the images
             var storageManager = new StorageService();
-            List<UploadedImage> result = storageManager.SaveImages(images);            
+            List<UploadedImage> result = storageManager.SaveImages(images);
 
             // Update the facial profile
             foreach(var image in result)

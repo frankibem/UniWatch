@@ -122,10 +122,9 @@ namespace UniWatch.Services
         /// <summary>
         /// Clear all data stored in the container
         /// </summary>
-        public async void ClearAll()
+        public void ClearAll()
         {
-            await _container.DeleteIfExistsAsync();
-            await _container.CreateIfNotExistsAsync();
+            Task.Run(() => _container.DeleteIfExistsAsync()).Wait();
         }
     }
 }
