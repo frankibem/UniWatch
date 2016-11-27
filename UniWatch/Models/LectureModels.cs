@@ -19,6 +19,11 @@ namespace UniWatch.Models
         public DateTime RecordDate { get; set; }
 
         /// <summary>
+        /// The id of the class
+        /// </summary>
+        public int ClassId { get; set; }
+
+        /// <summary>
         /// The class that this lecture was recorded for
         /// </summary>
         [Required]
@@ -54,6 +59,16 @@ namespace UniWatch.Models
         /// </summary>
         [Required]
         public bool Present { get; set; }
+
+        /// <summary>
+        /// The id of the student
+        /// </summary>
+        public int StudentId { get; set; }
+
+        /// <summary>
+        /// The id of the lecture
+        /// </summary>
+        public int LectureId { get; set; }
 
         /// <summary>
         /// The student related to this record

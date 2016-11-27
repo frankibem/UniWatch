@@ -38,6 +38,11 @@ namespace UniWatch.Models
         public int Year { get; set; }
 
         /// <summary>
+        /// The id of th eteacher
+        /// </summary>
+        public int TeacherId { get; set; }
+    
+        /// <summary>
         /// The training status for the PersonGroup associated with this class
         /// </summary>
         public TrainingStatus TrainingStatus { get; set; }
@@ -74,6 +79,16 @@ namespace UniWatch.Models
         /// The unique identifier for the student's Person in the PersonGroup
         /// </summary>
         public Guid PersonId { get; set; }
+
+        /// <summary>
+        /// The id of the class
+        /// </summary>
+        public int ClassId { get; set; }
+
+        /// <summary>
+        /// The id of the student
+        /// </summary>
+        public int StudentId { get; set; }
 
         /// <summary>
         /// The class related to this enrollment

@@ -34,6 +34,8 @@ namespace UniWatch.Models
     /// </summary>
     public class Student : User
     {
+        public int ProfileId { get; set; }
+
         /// <summary>
         /// The students facial profile
         /// </summary>

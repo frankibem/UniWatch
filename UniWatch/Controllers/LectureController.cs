@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -93,7 +94,7 @@ namespace UniWatch.Controllers
         }
 
         /// <summary>
-        /// Display the
+        /// Returns the view to create a new lecture
         /// </summary>
         /// <param name="classId"></param>
         [HttpGet]
@@ -157,8 +158,15 @@ namespace UniWatch.Controllers
                 images.Add(file.InputStream);
             }
 
-            // TODO: Uncomment when services are functional
-            //_manager.LectureManager.RecordLecture(@class.Id, images);
+            try
+            {
+                _manager.LectureManager.RecordLecture(@class.Id, images);
+            }
+            catch(InvalidOperationException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
             return RedirectToAction("Index", "Lecture", new { classId = @class.Id });
         }
 
@@ -224,7 +232,6 @@ namespace UniWatch.Controllers
                 var statusMap = new Dictionary<int, AttendanceStatus>(@class.Enrollment.Count);
                 foreach(var enrollment in @class.Enrollment)
                 {
-                    // TODO: verify that Student object is included
                     var attStatus = new AttendanceStatus()
                     {
                         Student = enrollment.Student
@@ -285,6 +292,27 @@ namespace UniWatch.Controllers
             }
 
             return lvm;
+        }
+
+        /// <summary>
+        /// Initiates training for the recognizer of the given class
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        [HttpPost]
+        [ActionName("Train")]
+        [ValidateAntiForgeryToken]
+        public ActionResult Train(int classId)
+        {
+            try
+            {
+                _manager.ClassManager.TrainRecognizer(classId);
+            }
+            catch(InvalidOperationException)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            return RedirectToAction("Create", new { classId = classId });
         }
     }
 }

@@ -1,0 +1,30 @@
+﻿@{
+    var message = ViewBag.Message as string;
+    if(!string.IsNullOrEmpty(message))
+    {
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            @message
+        </div>
+    }
+}
+
+<div class="jumbotron">
+    <p class="lead">
+        Caution is adviced. The actions on this page <strong class="text-danger">cannot be undone once executed.</strong> (Think about the sleepless nights -- and the children)
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="list-group">
+            <a href="#" class="list-group-item active">Administrative Actions</a>
+            @Html.ActionLink("Clear the database", "Clear", new { item = "db" }, new { @class = "list-group-item" })
+            @Html.ActionLink("Clear Cognitive Services data", "Clear", new { item = "cognitive" }, new { @class = "list-group-item" })
+            @Html.ActionLink("Clear Azure Storage data", "Clear", new { item = "storage" }, new { @class = "list-group-item" })
+            @Html.ActionLink("Erase everything", "Clear", new { item = "all" }, new { @class = "list-group-item" })
+        </div>
+    </div>
+</div>

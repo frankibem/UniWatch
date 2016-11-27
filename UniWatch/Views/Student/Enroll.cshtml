@@ -3,22 +3,27 @@
 <h3>Enroll a Student</h3>
 <hr />
 
-@using (Html.BeginForm("Search", "Student", new { classId = Model.Class.Id }, FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
-    <div class="row">
-        <div class="form-group col-md-3">
-            <input id="studentId" name="studentId" type="text" class="form-control" maxlength="64" placeholder="Search" />
-            <input type="submit" class="btn btn-default" value="Search" />
-        </div>
+<div class="row">
+    <div class="form-group col-md-3">
+        @using(Html.BeginForm("Search", "Student", new { classId = Model.Class.Id }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div class="input-group">
+                <input id="searchTerm" name="searchTerm" type="text" class="form-control" maxlength="64" placeholder="Search" />
+                <div class="input-group-btn">
+                    <input type="submit" class="btn btn-default" value="Search" />
+                </div>
+            </div>
+        }
     </div>
-}
+</div>
 
-@if (Model.StudentsFound == null)
+
+@if(Model.StudentsFound == null)
 {
     <p>Search for the student by Id</p>
 }
-else if (!Model.StudentsFound.Any())
+else if(!Model.StudentsFound.Any())
 {
     <p>No results to display</p>
 }
@@ -35,20 +40,20 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var student in Model.StudentsFound)
+                @foreach(var student in Model.StudentsFound)
                 {
                     <tr>
                         <td>@student.Student.Id</td>
                         <td>@student.Student.FirstName</td>
                         <td>@student.Student.LastName</td>
                         <td>
-                            @if (student.Enrolled)
+                            @if(student.Enrolled)
                             {
                                 @:Already enrolled
                             }
                             else
                             {
-                                using (Html.BeginForm("Enroll", "Student", new { classId = Model.Class.Id, studentId = student.Student.Id }, FormMethod.Post))
+                                using(Html.BeginForm("Enroll", "Student", new { classId = Model.Class.Id, studentId = student.Student.Id }, FormMethod.Post))
                                 {
                                     @Html.AntiForgeryToken()
                                     <input type="submit" value="Enroll" class="btn btn-success" />

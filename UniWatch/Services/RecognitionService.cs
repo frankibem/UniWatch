@@ -46,17 +46,17 @@ namespace UniWatch.Services
         /// <param name="groupId">The id for the group to detect faces in</param>
         /// <param name="images">The images to detect faces in</param>
         /// <returns>A list of ids for detected students</returns>
-        public async Task<IEnumerable<Guid>> DetectStudents(string groupId, IEnumerable<Models.UploadedImage> images)
+        public IEnumerable<Guid> DetectStudents(string groupId, IEnumerable<Models.UploadedImage> images)
         {
             HashSet<Guid> detectedStudents = new HashSet<Guid>();
             var faceClient = GetFaceClient();
 
             foreach(var image in images)
             {
-                var detectedFaces = await faceClient.DetectAsync(image.Url);
+                var detectedFaces = Task.Run(() => faceClient.DetectAsync(image.Url)).Result;
 
                 var faceIds = detectedFaces.Select(f => f.FaceId).ToArray();
-                var identifyResults = await faceClient.IdentifyAsync(groupId, faceIds);
+                var identifyResults = Task.Run(() => faceClient.IdentifyAsync(groupId, faceIds)).Result;
 
                 foreach(var result in identifyResults)
                 {
@@ -76,11 +76,11 @@ namespace UniWatch.Services
         public static void ClearAll()
         {
             var faceClient = GetFaceClient();
-            var personGroups = faceClient.ListPersonGroupsAsync().Result;
+            var personGroups = Task.Run(() => faceClient.ListPersonGroupsAsync()).Result;
 
             foreach(var group in personGroups)
             {
-                faceClient.DeletePersonGroupAsync(group.PersonGroupId);
+                Task.Run(() => faceClient.DeletePersonGroupAsync(group.PersonGroupId)).Wait();
             }
         }
     }
