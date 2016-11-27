@@ -228,8 +228,8 @@ namespace UniWatch.DataAccess
                 var user = _db.Users.Find(student.IdentityId);
                 if(user != null)
                 {
-                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, "Attendance Information", message));
-                    smsService.SendMessage("", user.PhoneNumber, message);
+                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, subject, message));
+                    smsService.SendMessage(fromSms, user.PhoneNumber, message);
                 }
             }
             Task.WaitAll(tasks.ToArray());
