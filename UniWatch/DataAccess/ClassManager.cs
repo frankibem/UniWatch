@@ -149,13 +149,10 @@ namespace UniWatch.DataAccess
             var faceClient = RecognitionService.GetFaceClient();
             var person = Task.Run(() => faceClient.CreatePersonAsync(classId.ToString(), student.FirstName)).Result;
 
-            var tasks = new Task<Microsoft.ProjectOxford.Face.Contract.AddPersistedFaceResult>[student.Profile.Images.Count];
-            for(int i = 0; i < student.Profile.Images.Count; i++)
+            foreach(var image in student.Profile.Images)
             {
-                var image = student.Profile.Images.ElementAt(i);
-                tasks[i] = Task.Run(() => faceClient.AddPersonFaceAsync(@class.Id.ToString(), person.PersonId, image.Url));
+                Task.Run(() => faceClient.AddPersonFaceAsync(@class.Id.ToString(), person.PersonId, image.Url)).Wait();
             }
-            Task.WaitAll(tasks);
 
             // Update training status for class
             enrollment.PersonId = person.PersonId;
