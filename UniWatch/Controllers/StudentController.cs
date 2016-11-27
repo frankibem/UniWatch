@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -187,6 +188,76 @@ namespace UniWatch.Controllers
             }
 
             return RedirectToAction("Index", new { classId = classId });
+        }
+
+        /// <summary>
+        /// Displays a page to upload images of the student's face
+        /// </summary>
+        /// <param name="studentId">The id of the student</param>
+        [HttpGet]
+        public ActionResult Upload(int classId, int studentId)
+        {
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
+            if (student == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            ViewBag.ClassId = classId;
+
+            return View(student);
+        }
+
+        /// <summary>
+        /// Upload images of the student's face
+        /// </summary>
+        /// <param name="studentId">The id of the student</param>
+        /// <param name="files">The images to upload</param>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Upload(int classId, int studentId, IEnumerable<HttpPostedFileBase> files)
+        {
+            var student = _dataAccess.UserManager.GetStudentById(studentId);
+            if (student == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            if (!files.Any() || (files.Count() == 1 && files.ElementAt(0) == null))
+            {
+                ViewBag.ErrorMessage = "No file selected";
+                return View(student);
+            }
+
+            var validImageTypes = new string[]
+            {
+                "image/gif",
+                "image/jpeg",
+                "image/pjpeg",
+                "image/png",
+                "image/bmp"
+            };
+
+            var images = new List<Stream>(files.Count());
+            foreach (var file in files)
+            {
+                // TODO: Determine upload limit
+                if (file.ContentLength <= 0 /*|| file.ContentLength >= MAX_SIZE*/)
+                {
+                    ViewBag.ErrorMessage = "File must not be empty and must not exceed MAX_SIZE";
+                    return View(student);
+                }
+                else if (!validImageTypes.Contains(file.ContentType))
+                {
+                    ViewBag.ErrorMessage = "File type must be either gif, jpeg or png";
+                    return View(student);
+                }
+
+                images.Add(file.InputStream);
+            }
+
+            // TODO: Uncomment when services are functional
+            //_dataAccess.UserManager.SetStudentProfile(student.Id, images);
+            return RedirectToAction("Index", "Student", new { classId = classId });
         }
     }
 }
