@@ -4,6 +4,7 @@ using System.Linq;
 using UniWatch.Models;
 using System.Data.Entity;
 using UniWatch.Services;
+using System.Threading.Tasks;
 
 namespace UniWatch.DataAccess
 {
@@ -69,8 +70,8 @@ namespace UniWatch.DataAccess
             _db.SaveChanges();
 
             // Create the PersonGroup for this class
-            //var faceClient = RecognitionService.GetFaceClient();
-            //faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name).Wait();
+            var faceClient = RecognitionService.GetFaceClient();
+            Task.Run(() => faceClient.CreatePersonGroupAsync(added.Id.ToString(), added.Name)).Wait();
 
             return added;
         }
@@ -138,13 +139,27 @@ namespace UniWatch.DataAccess
             };
             _db.Enrollments.Add(enrollment);
 
-            // Create the Person for this student
-            //var faceClient = RecognitionService.GetFaceClient();
-            //var result = faceClient.CreatePersonAsync(classId.ToString(), student.FirstName).Result;
+            // Add the faces
+            if(!student.Profile.Images.Any())
+            {
+                throw new InvalidOperationException("Profile must be added before enrollment.");
+            }
 
-            //// Update training status for class
-            //enrollment.PersonId = result.PersonId;
-            //enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
+            // Create the Person for this student
+            var faceClient = RecognitionService.GetFaceClient();
+            var person = Task.Run(() => faceClient.CreatePersonAsync(classId.ToString(), student.FirstName)).Result;
+
+            var tasks = new Task<Microsoft.ProjectOxford.Face.Contract.AddPersistedFaceResult>[student.Profile.Images.Count];
+            for(int i = 0; i < student.Profile.Images.Count; i++)
+            {
+                var image = student.Profile.Images.ElementAt(i);
+                tasks[i] = Task.Run(() => faceClient.AddPersonFaceAsync(@class.Id.ToString(), person.PersonId, image.Url));
+            }
+            Task.WaitAll(tasks);
+
+            // Update training status for class
+            enrollment.PersonId = person.PersonId;
+            enrollment.Class.TrainingStatus = TrainingStatus.UnTrained;
             _db.SaveChanges();
 
             return enrollment;
@@ -166,8 +181,8 @@ namespace UniWatch.DataAccess
                 throw new InvalidOperationException("Error unenrolling student");
 
             // Delete the Person object from the PersonGroup
-            //var faceClient = RecognitionService.GetFaceClient();
-            //faceClient.DeletePersonAsync(classId.ToString(), enrollment.PersonId);
+            var faceClient = RecognitionService.GetFaceClient();
+            Task.Run(() => faceClient.DeletePersonAsync(classId.ToString(), enrollment.PersonId));
 
             // Remove all attendance and enrollment information
             var attendance = _db.Attendance.Where(a => a.Student.Id == studentId);
@@ -207,7 +222,7 @@ namespace UniWatch.DataAccess
             _db.SaveChanges();
 
             return @class;
-        
+
             // TODO: Delete all other class related data (Lectures, Enrollments)
         }
 
@@ -225,8 +240,14 @@ namespace UniWatch.DataAccess
             if(@class.TrainingStatus != TrainingStatus.UnTrained)
                 return;
 
+            @class.TrainingStatus = TrainingStatus.Training;
+            _db.SaveChanges();
+
             var recognitionService = new RecognitionService();
-            recognitionService.TrainRecognizer(classId.ToString()).Wait();
+            Task.Run(() => recognitionService.TrainRecognizer(classId.ToString())).Wait();
+
+            @class.TrainingStatus = TrainingStatus.Trained;
+            _db.SaveChanges();
         }
 
         public void Dispose()

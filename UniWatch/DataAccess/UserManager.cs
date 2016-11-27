@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using UniWatch.Models;
 using Microsoft.AspNet.Identity;
+using UniWatch.Services;
 
 namespace UniWatch.DataAccess
 {
@@ -134,8 +135,8 @@ namespace UniWatch.DataAccess
                 throw new InvalidOperationException("Error setting student profile");
 
             // Store the images
-            var storageManager = new StorageManager();
-            List<UploadedImage> result = storageManager.SaveImages(images).Result;
+            var storageManager = new StorageService();
+            List<UploadedImage> result = storageManager.SaveImages(images);            
 
             // Update the facial profile
             foreach(var image in result)

@@ -24,9 +24,6 @@ namespace UniWatch
 
             // Initialize Database
             Database.SetInitializer(new AppDbInitializer());
-
-            // Clear all Cognitive Service Data
-            // RecognitionService.ClearAll();
         }
     }
 }

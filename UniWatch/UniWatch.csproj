@@ -246,7 +246,7 @@
     <Compile Include="DataAccess\ILectureManager.cs" />
     <Compile Include="DataAccess\UserManager.cs" />
     <Compile Include="DataAccess\LectureManager.cs" />
-    <Compile Include="DataAccess\StorageManager.cs" />
+    <Compile Include="Services\StorageService.cs" />
     <Compile Include="DataAccess\IUserManager.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\RecognitionService.cs" />

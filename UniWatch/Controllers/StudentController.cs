@@ -255,8 +255,7 @@ namespace UniWatch.Controllers
                 images.Add(file.InputStream);
             }
 
-            // TODO: Uncomment when services are functional
-            //_dataAccess.UserManager.SetStudentProfile(student.Id, images);
+            _dataAccess.UserManager.SetStudentProfile(student.Id, images);
             return RedirectToAction("Index", "Student", new { classId = classId });
         }
     }

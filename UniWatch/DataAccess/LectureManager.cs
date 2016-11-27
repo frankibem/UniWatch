@@ -159,15 +159,15 @@ namespace UniWatch.DataAccess
             };
 
             // Save the images in Azure Storage
-            var storageManager = new StorageManager();
-            var uploadedImages = storageManager.SaveImages(images).Result;
+            var storageManager = new StorageService();
+            var uploadedImages = storageManager.SaveImages(images);
 
             foreach(var image in uploadedImages)
                 lecture.Images.Add(image);
 
             // Detect the faces in the images
             var recognitionService = new RecognitionService();
-            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages).Result;
+            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages);
 
             // Create StudentAttendance for each student in class
             var enrollments = _db.Enrollments.Where(e => e.Class.Id == classId)
