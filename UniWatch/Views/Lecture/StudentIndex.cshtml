@@ -1,0 +1,54 @@
+﻿@model UniWatch.ViewModels.ReportViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.ClassName</h2>
+<hr />
+
+@{
+    if (!Model.Lectures.Any())
+    {
+        <p>There are no lectures for this class</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>Lecture</th>
+                    <th>Present</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var status in Model.Statuses)
+                {
+                    foreach (var lecture in Model.Lectures)
+                    {
+                        <tr>
+                            <td>@lecture.RecordDate.ToShortDateString()</td>
+
+                            <td class="text-center">
+                                @if (!status.Attendance.ContainsKey(lecture.Id))
+                                {
+                                    <span class="glyphicon glyphicon-minus" style="color: cornflowerblue;"></span>
+                                }
+                                else if (status.Attendance[lecture.Id])
+                                {
+                                    <span class="glyphicon glyphicon-ok" style="color: green;"></span>
+                                }
+                                else
+                                {
+                                    <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+}

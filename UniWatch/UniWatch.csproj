@@ -343,13 +343,15 @@
     <Content Include="Views\Student\Index.cshtml" />
     <Content Include="Views\Student\UnEnroll.cshtml" />
     <Content Include="Views\Student\Enroll.cshtml" />
-    <Content Include="Views\Lecture\Index.cshtml" />
     <Content Include="Views\Lecture\Override.cshtml" />
     <Content Include="Views\Lecture\Create.cshtml" />
     <Content Include="Views\Lecture\Delete.cshtml" />
-    <Content Include="Views\Class\Index.cshtml" />
+    <Content Include="Views\Class\TeacherIndex.cshtml" />
     <Content Include="Views\Class\Create.cshtml" />
     <Content Include="Views\Class\Delete.cshtml" />
+    <Content Include="Views\Lecture\TeacherIndex.cshtml" />
+    <Content Include="Views\Lecture\StudentIndex.cshtml" />
+    <Content Include="Views\Class\StudentIndex.cshtml" />
     <Content Include="Views\Student\Upload.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Student\Profile.cshtml" />

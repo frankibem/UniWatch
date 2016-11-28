@@ -1,12 +1,16 @@
 ﻿@model IEnumerable<UniWatch.Models.Class>
 
-<h3>My Classes</h3>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Courses Taught</h3>
 
 <p>
     @Html.ActionLink("New Class", "Create", null, new { @class = "btn btn-success" })
 </p>
 
-@if(!Model.Any())
+@if (!Model.Any())
 {
     @:It's empty in here. Create a new class.
 }
@@ -29,11 +33,11 @@ else
                 </th>
                 <th></th>
             </tr>
-            @foreach(var item in Model)
+            @foreach (var item in Model)
             {
                 <tr>
                     <td>
-                        @Html.ActionLink(item.Name, "Index", "Lecture", new { classId = item.Id }, null)
+                        @Html.ActionLink(item.Name, "Index", "Lecture", new {classId = item.Id}, null)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Number)
@@ -45,10 +49,14 @@ else
                         @Html.DisplayFor(modelItem => item.Year)
                     </td>
                     <td>
-                        @Html.ActionLink("Delete", "Delete", new { classId = item.Id })
+                        @Html.ActionLink("Delete", "Delete", new {classId = item.Id})
                     </td>
                 </tr>
             }
         </table>
     </div>
 }
+
+<p>
+    @Html.ActionLink("New Class", "Create", null, new { @class = "btn btn-success" })
+</p>
