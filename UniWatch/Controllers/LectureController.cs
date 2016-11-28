@@ -44,6 +44,8 @@ namespace UniWatch.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
+
+                return View("TeacherIndex", report);
             }
             else
             {
@@ -54,9 +56,9 @@ namespace UniWatch.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
-            }
 
-            return View(report);
+                return View("StudentIndex", report);
+            }
         }
 
         /// <summary>
