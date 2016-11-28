@@ -343,11 +343,12 @@
     <Content Include="Views\Lecture\Override.cshtml" />
     <Content Include="Views\Lecture\Create.cshtml" />
     <Content Include="Views\Lecture\Delete.cshtml" />
-    <Content Include="Views\Class\Index.cshtml" />
+    <Content Include="Views\Class\TeacherIndex.cshtml" />
     <Content Include="Views\Class\Create.cshtml" />
     <Content Include="Views\Class\Delete.cshtml" />
     <Content Include="Views\Lecture\TeacherIndex.cshtml" />
     <Content Include="Views\Lecture\StudentIndex.cshtml" />
+    <Content Include="Views\Class\StudentView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
