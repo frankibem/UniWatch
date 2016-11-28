@@ -67,5 +67,11 @@ namespace UniWatch.DataAccess
         /// </summary>
         /// <param name="classId">Id of the class to delete</param>
         Class DeleteClass(int classId);
+
+        /// <summary>
+        /// Train the recognizer for the given class
+        /// </summary>
+        /// <param name="classId">The id of the class</param>
+        void TrainRecognizer(int classId);
     }
 }

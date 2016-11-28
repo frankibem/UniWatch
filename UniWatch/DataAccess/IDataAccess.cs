@@ -22,5 +22,10 @@ namespace UniWatch.DataAccess
         /// The manager for user related functionality
         /// </summary>
         IUserManager UserManager { get; }
+
+        /// <summary>
+        /// The underlying database context
+        /// </summary>
+        AppDbContext DbContext { get; }
     }
 }

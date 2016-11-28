@@ -1,0 +1,48 @@
+﻿@model UniWatch.Models.Student
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if(Model.Profile.Images.Any())
+{
+    <h3>Facial Profile for @string.Format($"{Model.FirstName} {Model.LastName}")</h3>
+    <div class="row">
+        @for(int i = 0; i < Model.Profile.Images.Count; i++)
+        {
+            var image = Model.Profile.Images.ElementAt(i);
+            <div class="col-md-4">
+                <div class="thumbnail">
+                    <a href="@image.Url" alt="Profile image 1">
+                        <img src="@image.Url" class="img-responsive" alt="Profile image 1" />
+                        <div class="caption">
+                            Profile image @(i + 1)
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <h3>@string.Format($"{Model.FirstName} {Model.LastName}") - Upload images of student's face</h3>
+    <hr />
+
+    <div class="row">
+        <div class="navbar-form">
+            <div class="form-group">
+                @using(Html.BeginForm("Upload", "Student", new { studentId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="input-group">
+                        <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" class="form-control" />
+                        <div class="input-group-btn">
+                            <input type="submit" value="Upload" class="btn btn-default" />
+                        </div>
+                    </div>
+                    <p class="text-danger">@ViewBag.ErrorMessage</p>
+                }
+            </div>
+        </div>
+    </div>
+}

@@ -130,12 +130,19 @@ namespace UniWatch.DataAccess
             if(existing == null)
                 throw new InvalidOperationException("Error deleting lecture.");
 
+            // Delete the images from storage
+            var storageService = new StorageService();
+            foreach(var image in existing.Images)
+                storageService.DeleteImage(image);
+            _db.Images.RemoveRange(existing.Images);
+
+            // Delete associated attendance objects
+            _db.Attendance.RemoveRange(existing.Attendance);
+
             var lecture = _db.Lectures.Remove(existing);
             _db.SaveChanges();
 
             return lecture;
-
-            // TODO: Delete all other lecture related information (Images (and blobs), Attendance)
         }
 
         /// <summary>
@@ -159,15 +166,15 @@ namespace UniWatch.DataAccess
             };
 
             // Save the images in Azure Storage
-            var storageManager = new StorageManager();
-            var uploadedImages = storageManager.SaveImages(images).Result;
+            var storageManager = new StorageService();
+            var uploadedImages = storageManager.SaveImages(images);
 
             foreach(var image in uploadedImages)
                 lecture.Images.Add(image);
 
             // Detect the faces in the images
             var recognitionService = new RecognitionService();
-            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages).Result;
+            var personIds = recognitionService.DetectStudents(classId.ToString(), uploadedImages);
 
             // Create StudentAttendance for each student in class
             var enrollments = _db.Enrollments.Where(e => e.Class.Id == classId)
@@ -221,8 +228,8 @@ namespace UniWatch.DataAccess
                 var user = _db.Users.Find(student.IdentityId);
                 if(user != null)
                 {
-                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, "Attendance Information", message));
-                    smsService.SendMessage("", user.PhoneNumber, message);
+                    tasks.Add(emailService.SendEmail(fromEmail, user.Email, subject, message));
+                    smsService.SendMessage(fromSms, user.PhoneNumber, message);
                 }
             }
             Task.WaitAll(tasks.ToArray());

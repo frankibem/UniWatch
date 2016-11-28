@@ -17,10 +17,7 @@ else {
             <thead class="table-inverse">
                 <tr>
                     <th>
-                        First Name
-                    </th>
-                    <th>
-                        Last Name
+                        Name
                     </th>
                     <th></th>
                 </tr>
@@ -30,8 +27,9 @@ else {
                 @foreach (var student in Model.EnrolledStudents)
                 {
                     <tr>
-                        <td>@student.FirstName</td>
-                        <td>@student.LastName</td>
+                        <td class="student-name">
+                            @Html.ActionLink($"{student.FirstName} {@student.LastName}", "Upload", "Student", new { classId = Model.Class.Id, studentId = student.Id }, null)
+                        </td>
                         <td>
                             @Html.ActionLink("UnEnroll", "UnEnroll", "Student", new { classId = Model.Class.Id, studentId = student.Id }, new { @class = "btn btn-danger" })
                         </td>

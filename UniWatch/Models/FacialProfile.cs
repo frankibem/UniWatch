@@ -16,6 +16,11 @@ namespace UniWatch.Models
         public int Id { get; set; }
 
         /// <summary>
+        /// The id of the student
+        /// </summary>
+        public int StudentId { get; set; }
+
+        /// <summary>
         /// The student that this profile belongs to
         /// </summary>
         public virtual Student Student { get; set; }

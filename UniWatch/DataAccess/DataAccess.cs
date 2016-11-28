@@ -71,6 +71,17 @@ namespace UniWatch.DataAccess
         }
 
         /// <summary>
+        /// The underlying database context
+        /// </summary>
+        public AppDbContext DbContext
+        {
+            get
+            {
+                return _db;
+            }
+        }
+
+        /// <summary>
         /// Initializes a default data access object
         /// </summary>
         public DataAccess() : this(new AppDbContext())

@@ -28,7 +28,9 @@ namespace UniWatch.Models
             // Create user roles if they do not exist
             const string teacherRole = "Teacher";
             const string studentRole = "Student";
-            var roles = new List<string> { "Admin", teacherRole, studentRole };
+            const string adminRole = "Admin";
+
+            var roles = new List<string> { adminRole, teacherRole, studentRole };
             foreach(var role in roles)
             {
                 if(!_roleManager.RoleExists(role))
@@ -36,6 +38,9 @@ namespace UniWatch.Models
                     _roleManager.Create(new IdentityRole(role));
                 }
             }
+
+            var admin = new ApplicationUser() { UserName = "admin@uniwatch.com", Email = "admin@uniwatch.com" };
+            CreateUsersAndAddToRole(new List<ApplicationUser> { admin }, adminRole);
 
             // Create some teachers
             var teacherList = new List<ApplicationUser>

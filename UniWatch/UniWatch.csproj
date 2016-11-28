@@ -231,6 +231,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\ClassController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LectureController.cs" />
@@ -246,7 +247,7 @@
     <Compile Include="DataAccess\ILectureManager.cs" />
     <Compile Include="DataAccess\UserManager.cs" />
     <Compile Include="DataAccess\LectureManager.cs" />
-    <Compile Include="DataAccess\StorageManager.cs" />
+    <Compile Include="Services\StorageService.cs" />
     <Compile Include="DataAccess\IUserManager.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\RecognitionService.cs" />
@@ -291,6 +292,8 @@
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -349,6 +352,10 @@
     <Content Include="Views\Lecture\TeacherIndex.cshtml" />
     <Content Include="Views\Lecture\StudentIndex.cshtml" />
     <Content Include="Views\Class\StudentView.cshtml" />
+    <Content Include="Views\Student\Upload.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Student\Profile.cshtml" />
+    <Content Include="Views\Student\_ProfileSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

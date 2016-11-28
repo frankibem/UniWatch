@@ -5,10 +5,35 @@
 
 <h3>@Model.Name - Record a new lecture</h3>
 
-@using(Html.BeginForm("Create", "Lecture", new { classId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+@if(Model.TrainingStatus == UniWatch.Models.TrainingStatus.UnTrained)
 {
-    @Html.AntiForgeryToken()
-    <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" />
-    <input type="submit" value="Upload" class="btn btn-default" />
-    <p class="text-danger">@ViewBag.ErrorMessage</p>
+    <div class="jumbotron">
+        <p class="lead">
+            To create a new lecture, we need to train our recognizer on the profile images. Please click the
+            button below to proceed
+        </p>
+        @using(Html.BeginForm("Train", "Lecture", new { classId = Model.Id }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="submit" value="Train Now" class = "btn btn-lg btn-success" />
+        }
+    </div>
+}
+else if(Model.TrainingStatus == UniWatch.Models.TrainingStatus.Training)
+{
+    <div class="jumbotron">
+        <p>
+            The recognizer for this class is currently being trained. Please check back later.
+        </p>
+    </div>
+}
+else
+{
+    using(Html.BeginForm("Create", "Lecture", new { classId = Model.Id }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="file" multiple name="files" accept="image/jpeg, image/png, image/gif, image/bmp" />
+        <input type="submit" value="Upload" class="btn btn-default" />
+        <p class="text-danger">@ViewBag.ErrorMessage</p>
+    }
 }
