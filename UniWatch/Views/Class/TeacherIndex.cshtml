@@ -4,11 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-    <h3>Courses Taught</h3>
+<h3>Courses Taught</h3>
 
-    <p>
-        @Html.ActionLink("New Class", "Create", null, new { @class = "btn btn-success" })
-    </p>
+<p>
+    @Html.ActionLink("New Class", "Create", null, new { @class = "btn btn-success" })
+</p>
 
 @if (!Model.Any())
 {
@@ -57,3 +57,6 @@ else
     </div>
 }
 
+<p>
+    @Html.ActionLink("New Class", "Create", null, new { @class = "btn btn-success" })
+</p>

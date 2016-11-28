@@ -48,7 +48,8 @@ namespace UniWatch.Controllers
 
                 return View("TeacherIndex", report);
             }
-            else
+
+            if (user is Student)
             {
                 Student student = user as Student;
                 report = GetStudentReport(classId, student.Id);
@@ -60,6 +61,8 @@ namespace UniWatch.Controllers
 
                 return View("StudentIndex", report);
             }
+
+            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
         }
 
         /// <summary>

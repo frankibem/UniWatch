@@ -38,15 +38,15 @@ namespace UniWatch.Controllers
                 Teacher teacher = user as Teacher;
                 return View("TeacherIndex", _dataAccess.ClassManager.GetClassesForTeacher(teacher.Id));
             }
-            else if(user is Student)
+
+            if (user is Student)
             {
                 Student student = user as Student;
                 return View("StudentIndex", _dataAccess.ClassManager.GetClassesForStudent(student.Id));
             }
-            else
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
-            }
+
+
+            return new HttpStatusCodeResult(HttpStatusCode.Unauthorized);
         }
 
         // GET: Create

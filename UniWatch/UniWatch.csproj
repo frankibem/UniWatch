@@ -351,7 +351,7 @@
     <Content Include="Views\Class\Delete.cshtml" />
     <Content Include="Views\Lecture\TeacherIndex.cshtml" />
     <Content Include="Views\Lecture\StudentIndex.cshtml" />
-    <Content Include="Views\Class\StudentView.cshtml" />
+    <Content Include="Views\Class\StudentIndex.cshtml" />
     <Content Include="Views\Student\Upload.cshtml" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Student\Profile.cshtml" />
