@@ -8,7 +8,7 @@
 
 @if (!Model.Any())
 {
-    @:It's empty in here. Create a new class.
+    @:It's empty in here. Your classes will show up once a teacher enrolls you in his/her class.
 }
 else
 {
@@ -28,7 +28,7 @@ else
                     @Html.DisplayNameFor(model => model.Year)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Teacher)
+                    Teacher
                 </th>
             </tr>
             @foreach (var item in Model)
@@ -47,8 +47,7 @@ else
                         @Html.DisplayFor(modelItem => item.Year)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Teacher.FirstName)
-                        @Html.DisplayFor(modelItem => item.Teacher.LastName)
+                        @string.Format($"{item.Teacher.FirstName} {item.Teacher.LastName}")
                     </td>
                 </tr>
             }
