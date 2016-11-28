@@ -34,22 +34,29 @@ namespace UniWatch.Controllers
         {
             // TODO: modify view to show appropriate information for either user type
             var user = _manager.UserManager.GetUser();
+            ReportViewModel report = null;
             if(user is Teacher)
             {
                 Teacher teacher = user as Teacher;
-                var report = GetTeacherReport(classId);
+                report = GetTeacherReport(classId);
                 if(report == null)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
                 }
 
-                return View(report);
             }
             else
             {
                 Student student = user as Student;
-                return View(new TeacherReportViewModel());
+                report = GetStudentReport(classId, student.Id);
+                
+                if (report == null)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                }
             }
+
+            return View(report);
         }
 
         /// <summary>
@@ -93,9 +100,9 @@ namespace UniWatch.Controllers
         }
 
         /// <summary>
-        /// Display the
+        /// Display the Lecture 
         /// </summary>
-        /// <param name="classId"></param>
+        /// <param name="classId">The ID of class</param>
         /// <returns></returns>
         [HttpGet]
         public ActionResult Create(int classId)
@@ -206,14 +213,14 @@ namespace UniWatch.Controllers
         /// </summary>
         /// <param name="classId">The id of the class</param>
         /// <returns>All the lectures, students, and attendance for a class</returns>
-        private TeacherReportViewModel GetTeacherReport(int classId)
+        private ReportViewModel GetTeacherReport(int classId)
         {
-            TeacherReportViewModel report = null;
+            ReportViewModel report = null;
             var @class = _manager.ClassManager.GetById(classId);
 
             if(@class != null)
             {
-                report = new TeacherReportViewModel()
+                report = new ReportViewModel()
                 {
                     ClassId = @class.Id,
                     ClassName = @class.Name,
@@ -250,6 +257,49 @@ namespace UniWatch.Controllers
             return report;
         }
 
+        ///<summary>
+        ///Get a report for the given class
+        ///</summary>
+        ///<param name="classId">The id of the class</param>
+        /// <returns>All the lectures, students, and attendance for a class</returns>
+        private ReportViewModel GetStudentReport(int classId, int studentId)
+        {
+            ReportViewModel report = null;
+            var @class = _manager.ClassManager.GetById(classId);
+            var student = _manager.UserManager.GetStudentById(studentId);
+
+            if(@class != null && student != null)
+            {
+                report = new ReportViewModel()
+                {
+                    ClassId = @class.Id,
+                    ClassName = @class.Name,
+                    Lectures = new List<Lecture>(@class.Lectures.OrderByDescending(lecture => lecture.RecordDate)),
+                    Statuses = new List<AttendanceStatus>(1)
+
+                };
+
+                // TODO: verify that Student object is included
+                var attStatus = new AttendanceStatus()
+                {
+                    Student = student
+                };
+                report.Statuses.Add(attStatus);
+                
+                foreach (var lecture in @class.Lectures)
+                {
+                    var att = lecture.Attendance.FirstOrDefault(a => a.Student.Id == student.Id);
+
+                    if (att != null)
+                    {
+                        attStatus.Attendance.Add(lecture.Id, att.Present);
+                    }
+                }  
+            }
+
+            return report;
+        }
+ 
         /// <summary>
         /// Get the lecture view model for a lecture
         /// </summary>

@@ -1,4 +1,4 @@
-﻿@model UniWatch.ViewModels.TeacherReportViewModel
+﻿@model UniWatch.ViewModels.ReportViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -19,24 +19,21 @@
             <table class="table table-hover table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>My Attendance</th>
-
-                        @foreach (var lecture in Model.Lectures)
-                        {
-                            <th class="text-center">
-                                @Html.ActionLink(lecture.RecordDate.ToShortDateString(), "Override", "Lecture", new { lectureId = lecture.Id }, null)
-                            </th>
-                        }
+                        
+                        <th>Lecture</th>
+                        <th>Present</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var status in Model.Statuses)
                     {
-                        <tr>
-                            @*<td>@string.Format($"{status.Student.FirstName} {status.Student.LastName}")</td>*@
+                        
+        
+                        foreach (var lecture in Model.Lectures)
+                        {
+                            <tr>
+                                <td>@lecture.RecordDate.ToShortDateString()</td>
 
-                            @foreach (var lecture in Model.Lectures)
-                            {
                                 <td class="text-center">
                                     @if (!status.Attendance.ContainsKey(lecture.Id))
                                     {
@@ -51,9 +48,11 @@
                                         <span class="glyphicon glyphicon-remove" style="color: red;"></span>
                                     }
                                 </td>
-                        }
-                      </tr>
-                    }
+
+                            </tr>
+                       }
+                            
+                  }
                 </tbody>
             </table>
         </div>
@@ -122,63 +121,3 @@ else
         </p>
     }
 }
-@*@{
-    <p>
-        @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
-        @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
-    </p>
-
-    if(!Model.Lectures.Any())
-    {
-        <p>There are no lectures for this class</p>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-hover table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-
-                        @foreach(var lecture in Model.Lectures)
-                        {
-                            <th class="text-center">
-                                @Html.ActionLink(lecture.RecordDate.ToShortDateString(), "Override", "Lecture", new { lectureId = lecture.Id }, null)
-                            </th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach(var status in Model.Statuses)
-                {
-                        <tr>
-                            <td>@string.Format($"{status.Student.FirstName} {status.Student.LastName}")</td>
-
-                            @foreach(var lecture in Model.Lectures)
-                            {
-                                <td class="text-center">
-                                    @if(!status.Attendance.ContainsKey(lecture.Id))
-                                    {
-                                        <span class="glyphicon glyphicon-minus" style="color: cornflowerblue;"></span>
-                                    }
-                                    else if(status.Attendance[lecture.Id])
-                                    {
-                                        <span class="glyphicon glyphicon-ok" style="color: green;"></span>
-                                    }
-                                    else
-                                    {
-                                        <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                                    }
-                                </td>
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <p>
-            @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
-            @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
-        </p>
-    }
-}*@

@@ -32,7 +32,7 @@ namespace UniWatch.ViewModels
     /// <summary>
     /// View model used to generate attendance report for teachers
     /// </summary>
-    public class TeacherReportViewModel
+    public class ReportViewModel
     {
         /// <summary>
         /// The id of the class in the report
@@ -54,7 +54,7 @@ namespace UniWatch.ViewModels
         /// </summary>
         public List<AttendanceStatus> Statuses { get; set; }
 
-        public TeacherReportViewModel()
+        public ReportViewModel()
         {
             Lectures = new List<Lecture>();
             Statuses = new List<AttendanceStatus>();
