@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<UniWatch.Models.Student>
 
+<h3></h3>
+<br/>
+
+<p>@Html.ActionLink("Back", "Index", "Class", null, new { @class = "btn btn-default" })</p>
+
 <div class="row help-block">
     &nbsp;
     <div class="col-md-4">
@@ -25,6 +30,3 @@
 
 @Html.Partial("_ProfileSearch", Model)
 
-<p>
-    @Html.ActionLink("Back", "Index", "Student", null, new { @class = "btn btn-default" })
-</p>

@@ -11,22 +11,24 @@
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
-                        <tr>
-                            <th>Student</th>
-                        </tr>
+                    <tr>
+                        <th>Student</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @foreach(var student in Model)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.ActionLink($"{student.FirstName} {student.LastName}", "Upload", new { studentId = student.Id })
-                                </td>
-                            </tr>
-                        }
+                    @foreach(var student in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.ActionLink($"{student.FirstName} {student.LastName}", "Upload", new { studentId = student.Id })
+                            </td>
+                        </tr>
+                    }
                     </tbody>
                 </table>
             </div>
+
+            <p>@Html.ActionLink("Back", "Index", "Class", null, new { @class = "btn btn-default" })</p>
         }
     </div>
 </div>
