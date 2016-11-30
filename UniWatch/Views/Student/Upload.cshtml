@@ -3,6 +3,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<p>
+    @Html.ActionLink("Back", "Profile", "Student", null, new { @class = "btn btn-default" })
+</p>
+
 @if(Model.Profile.Images.Any())
 {
     <h3>Facial Profile for @string.Format($"{Model.FirstName} {Model.LastName}")</h3>
@@ -46,3 +50,7 @@ else
         </div>
     </div>
 }
+
+<p>
+    @Html.ActionLink("Back", "Profile", "Student", null, new { @class = "btn btn-default" })
+</p>

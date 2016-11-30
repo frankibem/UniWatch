@@ -5,6 +5,10 @@
 
 <h3>@Model.Name - Record a new lecture</h3>
 
+<p>
+    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Id }, new { @class = "btn btn-default" })
+</p>
+
 @if(Model.TrainingStatus == UniWatch.Models.TrainingStatus.UnTrained)
 {
     <div class="jumbotron">

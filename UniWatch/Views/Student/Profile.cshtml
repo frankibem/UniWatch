@@ -4,7 +4,7 @@
     &nbsp;
     <div class="col-md-4">
         <div class="form-group form-horizontal">
-            @using(Ajax.BeginForm(
+            @using (Ajax.BeginForm(
                 new AjaxOptions
                 {
                     HttpMethod = "get",
@@ -13,9 +13,9 @@
                 }))
             {
                 <div class="input-group">
-                    <input type="search" name="searchTerm" class="form-control" />
+                    <input type="search" name="searchTerm" class="form-control"/>
                     <div class="input-group-btn">
-                        <input type="submit" class="btn btn-default" value="Search" />
+                        <input type="submit" class="btn btn-default" value="Search"/>
                     </div>
                 </div>
             }
@@ -24,3 +24,7 @@
 </div>
 
 @Html.Partial("_ProfileSearch", Model)
+
+<p>
+    @Html.ActionLink("Back", "Index", "Student", null, new { @class = "btn btn-default" })
+</p>

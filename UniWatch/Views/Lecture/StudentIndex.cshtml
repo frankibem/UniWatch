@@ -7,6 +7,10 @@
 <h2>@Model.ClassName</h2>
 <hr />
 
+<p>
+    @Html.ActionLink("Back", "Index", "Class")
+</p>
+
 @{
     if (!Model.Lectures.Any())
     {
@@ -50,5 +54,9 @@
                 </tbody>
             </table>
         </div>
+
+        <p>
+            @Html.ActionLink("Back", "Index", "Class")
+        </p>
     }
 }

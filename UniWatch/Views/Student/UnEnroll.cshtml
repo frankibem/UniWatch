@@ -1,6 +1,6 @@
 ﻿@model UniWatch.ViewModels.UnEnrollViewModel
 
-<h3>Unenroll @string.Format("{0} {1}", Model.Student.FirstName, Model.Student.LastName) from @Model.Class.Name ?</h3>
+<h3>Unenroll @($"{Model.Student.FirstName} {Model.Student.LastName}") from @Model.Class.Name?</h3>
 
 <p>Removing this student from this class will delete all associated data and cannot be undone. Proceed?</p>
 

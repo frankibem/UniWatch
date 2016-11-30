@@ -1,6 +1,6 @@
 ﻿@model UniWatch.Models.Class
 
-<h3>Delete @string.Format("\"{0} {1}-{2}\" for {3} {4}?", Model.Name, Model.Number, Model.Section, Model.Semester, Model.Year)</h3>
+<h3>Delete @($"\"{Model.Name} {Model.Number}-{Model.Section}\" for {Model.Semester} {Model.Year}?")</h3>
 
 <p>This will delete all information related to this class - enrollments, recorded lectures... and cannot be undone. Proceed?</p>
 

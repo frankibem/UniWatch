@@ -7,10 +7,17 @@
 <h2>@Model.Class.Name - @Model.Lecture.RecordDate.ToShortDateString()</h2>
 <hr />
 
-@using(Html.BeginForm("Override", "Lecture", FormMethod.Post))
+<p>
+    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+    <input type="submit" value="Update" class="btn btn-success" />
+    @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
+</p>
+
+@using (Html.BeginForm("Override", "Lecture", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(model => model.Lecture.Id);
+    @Html.HiddenFor(model => model.Lecture.Id)
+    ;
 
     if (!Model.LectureItems.Any())
     {
@@ -18,10 +25,6 @@
     }
     else
     {
-        @Html.ActionLink("Back", "Index", "Lecture", new {classId = Model.Class.Id}, new {@class = "btn btn-default"})
-        <input type="submit" value="Update" class="btn btn-success"/>
-        @Html.ActionLink("Delete", "Delete", "Lecture", new {lectureId = Model.Lecture.Id}, new {@class = "btn btn-danger"})
-        <p/>
         <div class="table-responsive">
             <table class="table table-hover table-bordered table-striped">
                 <thead>
@@ -46,7 +49,7 @@
             </table>
         </div>
 
-        <p />
+        <p/>
         if (Model.Lecture.Images.Any())
         {
             <div id="divCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
@@ -85,15 +88,16 @@
                     <span class="sr-only">Next</span>
                 </a>
             </div>
+
+            <p>
+                @Html.ActionLink("Back", "Index", "Lecture", new {classId = Model.Class.Id}, new {@class = "btn btn-default"})
+                <input type="submit" value="Update" class="btn btn-success"/>
+                @Html.ActionLink("Delete", "Delete", "Lecture", new {lectureId = Model.Lecture.Id}, new {@class = "btn btn-danger"})
+            </p>
         }
         else
         {
             <h4>There are no attendance images for this lecture</h4>
         }
-        <br/>
-
-        @Html.ActionLink("Back", "Index", "Lecture", new {classId = Model.Class.Id}, new {@class = "btn btn-default"})
-        <input type="submit" value="Update" class="btn btn-success"/>
-        @Html.ActionLink("Delete", "Delete", "Lecture", new {lectureId = Model.Lecture.Id}, new {@class = "btn btn-danger"})
     }
 }

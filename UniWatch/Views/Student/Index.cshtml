@@ -4,7 +4,8 @@
 <hr />
 
 <p>
-    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = Model.Class.Id }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Enroll a Student", "Enroll", "Student", new {classId = Model.Class.Id}, new {@class = "btn btn-primary"})
 </p>
 
 @if (!Model.EnrolledStudents.Any())
@@ -15,27 +16,30 @@ else {
     <div class="table-responsive">
         <table class="table table-hover">
             <thead class="table-inverse">
-                <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th></th>
-                </tr>
+            <tr>
+                <th>Name</th>
+                <th></th>
+            </tr>
             </thead>
 
             <tbody>
-                @foreach (var student in Model.EnrolledStudents)
-                {
-                    <tr>
-                        <td class="student-name">
-                            @Html.ActionLink($"{student.FirstName} {@student.LastName}", "Upload", "Student", new { classId = Model.Class.Id, studentId = student.Id }, null)
-                        </td>
-                        <td>
-                            @Html.ActionLink("UnEnroll", "UnEnroll", "Student", new { classId = Model.Class.Id, studentId = student.Id }, new { @class = "btn btn-danger" })
-                        </td>
-                    </tr>
-                }
+            @foreach (var student in Model.EnrolledStudents)
+            {
+                <tr>
+                    <td class="student-name">
+                        @Html.ActionLink($"{student.FirstName} {@student.LastName}", "Upload", "Student", new { classId = Model.Class.Id, studentId = student.Id }, null)
+                    </td>
+                    <td>
+                        @Html.ActionLink("UnEnroll", "UnEnroll", "Student", new { classId = Model.Class.Id, studentId = student.Id }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
+
+    <p>
+        @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+        @Html.ActionLink("Enroll a Student", "Enroll", "Student", new { classId = Model.Class.Id }, new { @class = "btn btn-primary" })
+    </p>
 }
