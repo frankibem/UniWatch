@@ -6,6 +6,8 @@
 @if(Model.Profile.Images.Any())
 {
     <h3>Facial Profile for @string.Format($"{Model.FirstName} {Model.LastName}")</h3>
+    <hr/>
+
     <div class="row">
         @for(int i = 0; i < Model.Profile.Images.Count; i++)
         {
@@ -46,3 +48,7 @@ else
         </div>
     </div>
 }
+
+<p>
+    @Html.ActionLink("Back", "Index", "Student", new { classId = (int)ViewBag.ClassId }, new { @class = "btn btn-default" })
+</p>

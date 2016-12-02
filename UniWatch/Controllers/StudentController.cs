@@ -211,15 +211,18 @@ namespace UniWatch.Controllers
         /// <summary>
         /// Displays a page to upload images of the student's face
         /// </summary>
+        /// <param name="classId">The id of the class</param>
         /// <param name="studentId">The id of the student</param>
         [HttpGet]
-        public ActionResult Upload(int studentId)
+        public ActionResult Upload(int classId, int studentId)
         {
             var student = _dataAccess.UserManager.GetStudentById(studentId);
             if(student == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+
+            ViewBag.ClassId = classId;
 
             return View(student);
         }

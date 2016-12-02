@@ -7,12 +7,13 @@
 <h2>@Model.ClassName</h2>
 <hr />
 
-@{
-    <p>
-        @Html.ActionLink("New Lecture", "Create", "Lecture", new {classId = Request.QueryString["classId"]}, new {@class = "btn btn-primary"})
-        @Html.ActionLink("Manage Students", "Index", "Student", new {classId = Request.QueryString["classId"]}, new {@class = "btn btn-default"})
-    </p>
+<p>
+    @Html.ActionLink("Back", "Index", "Class", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
+</p>
 
+@{
     if (!Model.Lectures.Any())
     {
         <p>There are no lectures for this class</p>
@@ -27,9 +28,9 @@
 
                     @foreach (var lecture in Model.Lectures)
                     {
-                    <th class="text-center">
-                        @Html.ActionLink(lecture.RecordDate.ToShortDateString(), "Override", "Lecture", new {lectureId = lecture.Id}, null)
-                    </th>
+                        <th class="text-center">
+                            @Html.ActionLink(lecture.RecordDate.ToShortDateString(), "Override", "Lecture", new {lectureId = lecture.Id}, null)
+                        </th>
                     }
                 </tr>
                 </thead>
@@ -63,8 +64,9 @@
         </div>
 
         <p>
-            @Html.ActionLink("New Lecture", "Create", "Lecture", new {classId = Request.QueryString["classId"]}, new {@class = "btn btn-primary"})
-            @Html.ActionLink("Manage Students", "Index", "Student", new {classId = Request.QueryString["classId"]}, new {@class = "btn btn-default"})
+            @Html.ActionLink("Back", "Index", "Class", null, new { @class = "btn btn-default" })
+            @Html.ActionLink("New Lecture", "Create", "Lecture", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-primary" })
+            @Html.ActionLink("Manage Students", "Index", "Student", new { classId = Request.QueryString["classId"] }, new { @class = "btn btn-default" })
         </p>
     }
 }

@@ -23,6 +23,22 @@ textarea {
     max-width: 280px;
 }
 
+/* Main */
+.uniwatch-bg {
+    background: url("https://static.pexels.com/photos/30200/pexels-photo-30200.jpg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+    .uniwatch-bg .lead {
+        color: white;
+        text-shadow: 0 0 2px #000; /* horizontal-offset vertical-offset 'blur' colour */
+        -moz-text-shadow: 0 0 2px #000;
+        -webkit-text-shadow: 0 0 2px #000;
+    }
+
 /* Student */
 .student-name {
     vertical-align: middle !important;
