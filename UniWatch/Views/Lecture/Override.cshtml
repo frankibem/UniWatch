@@ -7,15 +7,16 @@
 <h2>@Model.Class.Name - @Model.Lecture.RecordDate.ToShortDateString()</h2>
 <hr />
 
-<p>
-    @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
-    <input type="submit" value="Update" class="btn btn-success" />
-    @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
-</p>
-
 @using (Html.BeginForm("Override", "Lecture", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
+
+    <p>
+        @Html.ActionLink("Back", "Index", "Lecture", new { classId = Model.Class.Id }, new { @class = "btn btn-default" })
+        <input type="submit" value="Update" class="btn btn-success" />
+        @Html.ActionLink("Delete", "Delete", "Lecture", new { lectureId = Model.Lecture.Id }, new { @class = "btn btn-danger" })
+    </p>
+
     @Html.HiddenFor(model => model.Lecture.Id)
     ;
 
